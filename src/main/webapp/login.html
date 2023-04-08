@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <title>Login</title>
+    <link rel="icon" href="favicon.ico">
+    <link href="static/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <link href="static/validationEngine/validationEngine.jquery.min.css" rel="stylesheet">
+    <link href="css/css.css" rel="stylesheet">
+    <link href="css/font-awesome.css" rel="stylesheet">
+    <link href="css/form-elements.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <script src="static/jquery.min.js"></script>
+    <script src="static/purl.min.js"></script>
+    <script src="static/jquery.backstretch.min.js"></script>
+    <script src="static/validationEngine/jquery.validationEngine.min.js"></script>
+    <script type="text/javascript">
+	$(function(){
+		if($("#form-username").val()==""){
+			$("#form-username").focus();
+		}
+		$(document).keydown(function(event){
+			if(event.keyCode==13){
+				$("#login_form").submit();
+			}
+		});
+		$.backstretch("image/backimg.jpg");
+		$("input[name='requri']").val($.url(window.location.href).param('requri'));
+		$("#login_form").validationEngine('attach', {
+			showOneMessage: false,
+			"custom_error_messages": {
+				"#username": {
+					'required': {
+						'message': "User name is required"
+					},
+					'custom[email]': {
+						'message': "Email address is required"
+					}
+				}
+			},
+			promptPosition: "top",
+			scroll: false,
+			onValidationComplete: function(form, status) {
+				console.log("The form status is: " + status + ", it cannot be submitted");
+				return status;
+			}
+		});
+	});
+</script>
+</head>
+<body>
+<div class="container">
+    <div class="top-content">
+        <div class="inner-bg">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-8 col-sm-offset-2 text">
+                        <h1>
+                            <strong>ENA Timesheet</strong>
+                        </h1>
+                        <div class="description">
+                            <p>
+                                This is a responsive login form made with Bootstrap.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-3 form-box">
+                        <div class="form-top">
+                            <div class="form-top-left">
+                                <h3>Log in to use the app</h3>
+                                <p>Enter your username and password to log on:</p>
+                            </div>
+                            <div class="form-top-right"></div>
+                        </div>
+                        <div class="form-bottom">
+                            <form role="form" action="login" method="post"
+                                  class="login-form" id="login_form">
+                                <div class="form-group">
+                                    <label class="sr-only" for="form-username">User Name</label> <input
+                                        name="username" placeholder="Username..."
+                                        class="validate[required] form-username form-control input-error"
+                                        id="form-username" type="text">
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="form-password">Password</label> <input
+                                        name="password" placeholder="Password..."
+                                        class="validate[required] form-password form-control input-error"
+                                        id="form-password" type="password">
+                                </div>
+                                <input name="requri" type="hidden" value=""/>
+                                <button type="submit" class="btn">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
