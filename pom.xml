@@ -82,7 +82,7 @@
                     <version>3.2.2</version>
                     <configuration>
                         <warSourceDirectory>src/main/webapp</warSourceDirectory>
-                        <warName>enats</warName>
+                        <warName>ROOT</warName>
                         <failOnMissingWebXml>false</failOnMissingWebXml>
                     </configuration>
                 </plugin>
@@ -105,6 +105,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        <finalName>enats</finalName>
+        <finalName>ROOT</finalName>
     </build>
 </project>
