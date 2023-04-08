@@ -1,11 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.aws.codestar.projecttemplates</groupId>
-    <artifactId>HelloWorld</artifactId>
+    <artifactId>enats</artifactId>
     <version>1.0</version>
     <packaging>war</packaging>
-    <name>Sample Spring MVC Application Using AWS CodeStar</name>
+    <name>ENA Timesheet</name>
 
     <properties>
         <junit.platform.version>1.2.0</junit.platform.version>
@@ -81,7 +82,7 @@
                     <version>3.2.2</version>
                     <configuration>
                         <warSourceDirectory>src/main/webapp</warSourceDirectory>
-                        <warName>ROOT</warName>
+                        <warName>enats</warName>
                         <failOnMissingWebXml>false</failOnMissingWebXml>
                     </configuration>
                 </plugin>
@@ -104,6 +105,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        <finalName>ROOT</finalName>
+        <finalName>enats</finalName>
     </build>
 </project>
