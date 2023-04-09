@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
-import com.aws.codestar.projecttemplates.controller.HelloWorldController;
+import com.aws.codestar.projecttemplates.controller.Controller;
 
 /**
  * Spring configuration for sample application.
@@ -24,8 +24,8 @@ public class ApplicationConfig {
     private String siteName;
 
     @Bean
-    public HelloWorldController helloWorld() {
-        return new HelloWorldController(this.siteName);
+    public Controller helloWorld() {
+        return new Controller(this.siteName);
     }
 
     /**
