@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload ENA Timesheet</title>
+    <style>
+    /* CSS code to center the form */
+    html, body {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    form {
+      width: 400px;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin: 0 auto;
+    }
+    form label, form input {
+      //display: block;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    form input[type="submit"] {
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+<script>
+    function setDatePickerDefault() {
+      // Get the date picker element.
+      var datePicker = document.getElementById("date");
+
+      // Get the current date.
+      var today = new Date();
+
+      // Get the month before this month.
+      var previousMonth = today.getMonth() - 1;
+
+      // Set the default value of the date picker to the 15th of the previous month.
+      var yyyy = today.getFullYear();
+      var mm = String(today.getMonth()).padStart(2, '0');
+      var dd = "15";
+      var defaultDay = yyyy + '-' + mm + '-' + dd;
+      datePicker.value = defaultDay;
+    }
+
+    // Call the setDatePickerDefault() function when the page loads.
+    window.onload = setDatePickerDefault;
+  </script>
+<div style="text-align: center;">
+    <h2>Upload ENA Timesheet</h2>
+
+    <form action="/upload-ena-ts" method="post" id="upload-form" enctype="multipart/form-data" style="text-align: center;">
+        <label for="date">Timesheet for month:</label>
+        <input type="date" id="date" name="date">
+        <br>
+        <label for="file">File:</label>
+        <input type="file" id="file" name="file">
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+</div>
+</body>
+</html>
