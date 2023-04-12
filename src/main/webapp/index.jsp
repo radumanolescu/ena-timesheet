@@ -1,12 +1,10 @@
 <html>
+    <title>ENA Timesheet</title>
 <body>
-	<h2>Hit Submit</h2>
-	<form method="POST" action="/enats/hello">
-		<table>
-			<tr>
-				<td colspan="2"><input type="submit" value="Submit" /></td>
-			</tr>
-		</table>
-	</form>
+    <div style="text-align: center;">
+        <h2>ENA Timesheet</h2>
+        <a href="/ena/upload.html">Upload ENA Timesheet</a>
+        <a href="/phd/upload.html">Upload PHD Template</a>
+    </div>
 </body>
 </html>

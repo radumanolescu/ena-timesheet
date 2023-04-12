@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 @WebServlet(name = "fileUploadServlet", urlPatterns = {"/upload-ena-ts"})
-@MultipartConfig(fileSizeThreshold = 0,
+@MultipartConfig(location="/tmp", fileSizeThreshold = 4194304,
         maxFileSize = 5242880,       // 5 MB
         maxRequestSize = 20971520)   // 20 MB
 public class FileUploadServlet extends HttpServlet {
