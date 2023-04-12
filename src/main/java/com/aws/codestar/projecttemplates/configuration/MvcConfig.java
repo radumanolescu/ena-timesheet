@@ -3,8 +3,7 @@ package com.aws.codestar.projecttemplates.configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.web.multipart.MultipartResolver;
-import org.springframework.web.multipart.support.StandardServletMultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -34,8 +33,13 @@ public class MvcConfig implements WebMvcConfigurer {
     }
 
     @Bean(name = "multipartResolver")
-    public MultipartResolver getMultipartResolver() {
-        return new StandardServletMultipartResolver();
+    public CommonsMultipartResolver getMultipartResolver() {
+        return new CommonsMultipartResolver();
     }
+
+//    @Bean(name = "multipartResolver")
+//    public MultipartResolver getMultipartResolver() {
+//        return new StandardServletMultipartResolver();
+//    }
 
 }
