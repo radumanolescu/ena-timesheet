@@ -14,15 +14,15 @@ import static com.aws.codestar.projecttemplates.util.Time.weekOfMonth;
 import static com.aws.codestar.projecttemplates.xl.XlUtil.getLocalTime;
 import static com.aws.codestar.projecttemplates.xl.XlUtil.stringValue;
 
-public class XEntry implements Comparable<XEntry> {
+public class EnaTsEntry implements Comparable<EnaTsEntry> {
 
-    public XEntry() {
+    public EnaTsEntry() {
     }
 
     /**
      * Expected row format: projectId#activity, day, start, end, hours, description
      */
-    public XEntry(int lineId, LocalDate month, Row row) {
+    public EnaTsEntry(int lineId, LocalDate month, Row row) {
         this.entryId = (float) lineId;
         this.month = month;
 
@@ -105,7 +105,7 @@ public class XEntry implements Comparable<XEntry> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        XEntry that = (XEntry) o;
+        EnaTsEntry that = (EnaTsEntry) o;
         return month.equals(that.month) && day.equals(that.day) && start.equals(that.start);
     }
 
@@ -115,7 +115,7 @@ public class XEntry implements Comparable<XEntry> {
     }
 
     @Override
-    public int compareTo(XEntry that) {
+    public int compareTo(EnaTsEntry that) {
         return (int) Math.signum(this.getEntryId() - that.getEntryId());
     }
 

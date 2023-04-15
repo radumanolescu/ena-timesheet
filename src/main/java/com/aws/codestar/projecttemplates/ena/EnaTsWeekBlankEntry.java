@@ -3,9 +3,9 @@ package com.aws.codestar.projecttemplates.ena;
 /**
  * An entry that represents a blank line in the table
  */
-public class XWeekBlankEntry extends XEntry {
+public class EnaTsWeekBlankEntry extends EnaTsEntry {
 
-    public XWeekBlankEntry(float entryId) {
+    public EnaTsWeekBlankEntry(float entryId) {
         this.setEntryId(entryId);
         this.setProjectId("");
         this.setActivity("");

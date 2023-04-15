@@ -3,9 +3,9 @@ package com.aws.codestar.projecttemplates.ena;
 /**
  * An entry that represents a total for a week
  */
-public class XWeekTotalEntry extends XEntry {
+public class EnaTsWeekTotalEntry extends EnaTsEntry {
 
-    public XWeekTotalEntry(float entryId, String hoursLabel, Float totalHours, String chargeLabel, Float totalCharge) {
+    public EnaTsWeekTotalEntry(float entryId, String hoursLabel, Float totalHours, String chargeLabel, Float totalCharge) {
         this.hoursLabel = hoursLabel;
         this.chargeLabel = chargeLabel;
         this.setEntryId(entryId);

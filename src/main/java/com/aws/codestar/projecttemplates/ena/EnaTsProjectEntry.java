@@ -3,9 +3,9 @@ package com.aws.codestar.projecttemplates.ena;
 import java.text.DecimalFormat;
 import java.util.Objects;
 
-public class XProjectEntry implements Comparable<XProjectEntry>{
+public class EnaTsProjectEntry implements Comparable<EnaTsProjectEntry>{
 
-    public XProjectEntry(String projectId, String activity, Float hours) {
+    public EnaTsProjectEntry(String projectId, String activity, Float hours) {
         this.projectId = projectId;
         this.activity = activity;
         this.hours = hours;
@@ -46,7 +46,7 @@ public class XProjectEntry implements Comparable<XProjectEntry>{
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        XProjectEntry that = (XProjectEntry) o;
+        EnaTsProjectEntry that = (EnaTsProjectEntry) o;
         return projectId.equals(that.projectId) && activity.equals(that.activity) && hours.equals(that.hours);
     }
 
@@ -60,7 +60,7 @@ public class XProjectEntry implements Comparable<XProjectEntry>{
     }
 
     @Override
-    public int compareTo(XProjectEntry that) {
+    public int compareTo(EnaTsProjectEntry that) {
         return this.projectActivity().compareTo(that.projectActivity());
     }
 
