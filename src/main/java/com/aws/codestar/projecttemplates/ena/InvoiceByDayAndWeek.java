@@ -9,21 +9,21 @@ public class InvoiceByDayAndWeek {
         entries = new ArrayList<>();
     }
 
-    public InvoiceByDayAndWeek(List<InvoiceActivityEntry> entries) {
+    public InvoiceByDayAndWeek(List<InvoiceByDayAndWeekEntry> entries) {
         this.entries = entries;
     }
 
-    private List<InvoiceActivityEntry> entries;
+    private List<InvoiceByDayAndWeekEntry> entries;
     
-    public List<InvoiceActivityEntry> getEntries() {
+    public List<InvoiceByDayAndWeekEntry> getEntries() {
         return entries;
     }
     
-    public void setEntries(List<InvoiceActivityEntry> entries) {
+    public void setEntries(List<InvoiceByDayAndWeekEntry> entries) {
         this.entries = entries;
     }
     
-    public void addEntry(InvoiceActivityEntry entry) {
+    public void addEntry(InvoiceByDayAndWeekEntry entry) {
         entries.add(entry);
     }
 

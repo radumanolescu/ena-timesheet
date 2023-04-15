@@ -1,29 +1,28 @@
 package com.aws.codestar.projecttemplates.ena;
 
+import com.aws.codestar.projecttemplates.json.JsonMapped;
+
+import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Objects;
 
-public class InvoiceActivityEntry {
-    public InvoiceActivityEntry() {
-    }
+public class InvoiceByDayAndWeekEntry extends JsonMapped<InvoiceByDayAndWeekEntry> {
+    private static DateTimeFormatter mmddyy = DateTimeFormatter.ofPattern("MM/dd/yy");
+    private static Locale locale = Locale.US;
+    private NumberFormat formatter = NumberFormat.getCurrencyInstance(locale);
 
-    public InvoiceActivityEntry(String project, String activity, String date, String hours, String rate, String description, String charge) {
-        this.project = project;
-        this.activity = activity;
-        this.date = date;
-        this.hours = hours;
-        this.rate = rate;
-        this.description = description;
-        this.charge = charge;
+    public InvoiceByDayAndWeekEntry() {
     }
 
     private String project;
     private String activity;
-    private String date;
-    private String hours;
-    private String rate;
+    private LocalDate date;
+    private Float hours;
+    private Float rate;
     private String description;
-    private String charge;
-
+    private Float charge;
 
     public String getProject() {
         return project;
@@ -42,26 +41,26 @@ public class InvoiceActivityEntry {
     }
 
     public String getDate() {
-        return date;
+        return date.format(mmddyy);
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
     public String getHours() {
-        return hours;
+        return "" + hours;
     }
 
-    public void setHours(String hours) {
+    public void setHours(Float hours) {
         this.hours = hours;
     }
 
     public String getRate() {
-        return rate;
+        return String.format("$%.0f/hr", rate);
     }
 
-    public void setRate(String rate) {
+    public void setRate(Float rate) {
         this.rate = rate;
     }
 
@@ -74,10 +73,10 @@ public class InvoiceActivityEntry {
     }
 
     public String getCharge() {
-        return charge;
+        return String.format("$%.2f", charge);
     }
 
-    public void setCharge(String charge) {
+    public void setCharge(Float charge) {
         this.charge = charge;
     }
 
@@ -85,7 +84,7 @@ public class InvoiceActivityEntry {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        InvoiceActivityEntry that = (InvoiceActivityEntry) o;
+        InvoiceByDayAndWeekEntry that = (InvoiceByDayAndWeekEntry) o;
         return project.equals(that.project) && activity.equals(that.activity) && date.equals(that.date) && hours.equals(that.hours) && rate.equals(that.rate) && description.equals(that.description) && charge.equals(that.charge);
     }
 
