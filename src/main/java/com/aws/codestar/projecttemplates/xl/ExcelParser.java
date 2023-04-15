@@ -4,10 +4,16 @@ import org.apache.poi.ss.usermodel.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.aws.codestar.projecttemplates.xl.XlUtil.numericCell;
+import static com.aws.codestar.projecttemplates.xl.XlUtil.stringValue;
 
 public class ExcelParser {
 
@@ -36,29 +42,6 @@ public class ExcelParser {
             data.add(stringValue(cell));
         }
         return data;
-    }
-
-    public String stringValue(Cell cell) {
-        switch (cell.getCellType()) {
-            case STRING:
-                return cell.getRichStringCellValue().getString();
-            case NUMERIC:
-                return numericCell(cell);
-            case BOOLEAN:
-                return cell.getBooleanCellValue() + "";
-            case FORMULA:
-                return cell.getCellFormula() + "";
-            default:
-                return "";
-        }
-    }
-
-    public String numericCell(Cell cell) {
-        if (DateUtil.isCellDateFormatted(cell)) {
-            return cell.getDateCellValue() + "";
-        } else {
-            return cell.getNumericCellValue() + "";
-        }
     }
 
 }

@@ -2,6 +2,7 @@ package com.aws.codestar.projecttemplates.ena;
 
 import com.aws.codestar.projecttemplates.json.JsonMapped;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,7 @@ public class EnaTimesheetEntry extends JsonMapped<EnaTimesheetEntry> {
     public EnaTimesheetEntry() {
     }
 
-    public EnaTimesheetEntry(Integer month, List<String> row) {
+    public EnaTimesheetEntry(LocalDate month, List<String> row) {
 
         StringBuilder err = new StringBuilder();
         this.month = month;
@@ -53,7 +54,7 @@ public class EnaTimesheetEntry extends JsonMapped<EnaTimesheetEntry> {
     }
 
 
-    public EnaTimesheetEntry(Integer month, String project_id, String activity,
+    public EnaTimesheetEntry(LocalDate month, String project_id, String activity,
                              Integer day, LocalTime start, LocalTime end,
                              Float hours, String description, String error) {
 
@@ -68,11 +69,11 @@ public class EnaTimesheetEntry extends JsonMapped<EnaTimesheetEntry> {
         this.error = error;
     }
 
-    public Integer getMonth() {
+    public LocalDate getMonth() {
         return month;
     }
 
-    public void setMonth(Integer month) {
+    public void setMonth(LocalDate month) {
         this.month = month;
     }
 
@@ -140,7 +141,7 @@ public class EnaTimesheetEntry extends JsonMapped<EnaTimesheetEntry> {
         this.error = error;
     }
 
-    private Integer month;
+    private LocalDate month;
     private String project_id;
     private String activity;
     private Integer day;
