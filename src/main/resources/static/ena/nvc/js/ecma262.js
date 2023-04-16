@@ -1146,6 +1146,6 @@ var PagedTableDoc;
   return PagedTableDoc;
 })(PagedTableDoc || (PagedTableDoc = {}));
 
-window.addEventListener('load', function() {
+window.onload = function() {
   PagedTableDoc.initAll();
-});
+};
