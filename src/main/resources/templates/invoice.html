@@ -180,8 +180,8 @@
         }
     </style>
     <!-- ignore: script src="js/highlight.js" -->
-    <link rel="stylesheet" href="/ena/nvc/css/pagedtable.css">
-    <script src="/ena/nvc/js/ecma262.js"></script>
+    <link rel="stylesheet" th:href="@{/ena/nvc/css/pagedtable.css}">
+    <script th:src="@{/ena/nvc/js/ecma262.js}"></script>
     <script>$(document).ready(function(){
     if (typeof $('[data-toggle="tooltip"]').tooltip === 'function') {
         $('[data-toggle="tooltip"]').tooltip();
@@ -191,7 +191,7 @@
     }
     });
     </script>
-    <link rel="stylesheet" href="/ena/nvc/css/lightable.css">
+    <link rel="stylesheet" th:href="@{/ena/nvc/css/lightable.css}">
     <style type="text/css">
       code{white-space: pre-wrap;}
       span.smallcaps{font-variant: small-caps;}
@@ -210,8 +210,8 @@
       }
     }
     </script>
-    <link rel="stylesheet" href="/ena/nvc/css/main-container.css">
-    <link rel="stylesheet" href="/ena/nvc/css/tabset.css">
+    <link rel="stylesheet" th:href="@{/ena/nvc/css/main-container.css}">
+    <link rel="stylesheet" th:href="@{/ena/nvc/css/tabset.css}">
 
 </head>
 
