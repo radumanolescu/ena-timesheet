@@ -27,6 +27,7 @@ public class UploadEnaTimesheet {
     @PostMapping(value = "/ena/upload/ena-timesheet")
     public String uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("date") String dateStr, Model model) {
         try (InputStream inputStream = file.getInputStream()) {
+            //System.out.println("Controller:Upload " + dateStr + ", " + file.getOriginalFilename() + ", " + file.getSize() + " bytes");
             LocalDate tsMonth = LocalDate.parse(dateStr, formatter);
             EnaTimesheet enaTimesheet = new EnaTimesheet(tsMonth, inputStream);
             List<EnaTsEntry> bdws = enaTimesheet.getEntries();
@@ -39,7 +40,6 @@ public class UploadEnaTimesheet {
             //logger.error("Error uploading file", e);
             System.out.println("Error uploading file");
         }
-
         return "invoice";
     }
 
