@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Upload ENA Timesheet</title>
     <style>
@@ -54,7 +54,7 @@
 <div style="text-align: center;">
     <h2>Upload ENA Timesheet</h2>
 
-    <form action="upload/ena-timesheet" method="post" id="upload-form" enctype="multipart/form-data" style="text-align: center;">
+    <form th:action="@{/ena/upload/ena-timesheet}" method="post" id="upload-form" enctype="multipart/form-data" style="text-align: center;">
         <label for="date">Timesheet for month:</label>
         <input type="date" id="date" name="date">
         <br>
