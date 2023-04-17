@@ -1765,6 +1765,9 @@ details > summary > p:only-child {
 pre code {
   padding: 0;
 }
+.bold {
+  font-weight: bold;
+}
 </style>
 
 
@@ -1885,8 +1888,8 @@ pre code {
             <td th:text="${entry.date}" style="text-align:left;"></td>
             <td th:text="${entry.hours}" style="text-align:left;"></td>
             <td th:text="${entry.rate}" style="text-align:left;"></td>
-            <td th:text="${entry.description}" style="text-align:left;"></td>
-            <td th:text="${entry.charge}" style="text-align:left;"></td>
+            <td th:text="${entry.description}" th:classappend="${entry.projectId == ''} ? 'bold' : ''" style="text-align:left;"></td>
+            <td th:text="${entry.charge}"      th:classappend="${entry.projectId == ''} ? 'bold' : ''" style="text-align:left;"></td>
         </tbody>
 
 </table>
@@ -1907,7 +1910,7 @@ pre code {
         </thead>
         <tbody>
         <tr th:each="entry : ${invoiceByProject}">
-            <td th:text="${entry.projectId}" style="text-align:left;"></td>
+            <td th:text="${entry.projectId}" th:classappend="${entry.projectId.contains('Total')} ? 'bold' : ''" style="text-align:left;"></td>
             <td th:text="${entry.activity}" style="text-align:left;"></td>
             <td th:text="${entry.hours}" style="text-align:right;"></td>
         </tr>

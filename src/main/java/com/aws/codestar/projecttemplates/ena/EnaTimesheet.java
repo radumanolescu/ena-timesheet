@@ -94,6 +94,7 @@ public class EnaTimesheet {
         totalsByWeek.add(new EnaTsWeekTotalEntry(maxEntryIdForMonth + 0.4f,
                 "Monthly hours:", hoursForMonth,
                 "Total consulting fees for month:", chargeForMonth));
+        totalsByWeek.add(new EnaTsWeekBlankEntry(maxEntryIdForMonth + 0.5f));
         return totalsByWeek;
     }
 
