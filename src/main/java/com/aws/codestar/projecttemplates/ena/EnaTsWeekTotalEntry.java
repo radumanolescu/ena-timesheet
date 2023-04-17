@@ -29,7 +29,7 @@ public class EnaTsWeekTotalEntry extends EnaTsEntry {
     }
 
     @Override
-    public String getCharge() {
+    public String getRate() {
         return "";
     }
 

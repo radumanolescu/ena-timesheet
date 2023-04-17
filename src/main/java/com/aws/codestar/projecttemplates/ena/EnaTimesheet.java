@@ -15,20 +15,22 @@ public class EnaTimesheet {
         this.timesheetMonth = timesheetMonth;
         int sheetIndex = 0; // Assume it's the first sheet
         List<EnaTsEntry> inputEntries = parseEntries(inputStream, sheetIndex);
+        sortByDayProjectId(inputEntries);
+        reindexEntries(inputEntries);
         List<EnaTsEntry> totalEntries = weeklyTotals(inputEntries);
-        this.entries.addAll(inputEntries);
-        this.entries.addAll(totalEntries);
-        Collections.sort(this.entries);
+        this.enaTsEntries.addAll(inputEntries);
+        this.enaTsEntries.addAll(totalEntries);
+        sortByEntryId(this.enaTsEntries);
         this.projectEntries.addAll(getProjectEntries(inputEntries));
     }
 
     private final LocalDate timesheetMonth;
 
     public List<EnaTsEntry> getEntries() {
-        return entries;
+        return enaTsEntries;
     }
 
-    private final List<EnaTsEntry> entries = new ArrayList<>();
+    private final List<EnaTsEntry> enaTsEntries = new ArrayList<>();
 
     public List<EnaTsProjectEntry> getProjectEntries() {
         return projectEntries;
@@ -52,6 +54,21 @@ public class EnaTimesheet {
             e.printStackTrace();
         }
         return enaEntries;
+    }
+
+    private void reindexEntries(List<EnaTsEntry> entries) {
+        int lineId = 0;
+        for (EnaTsEntry entry : entries) {
+            entry.setEntryId((float) lineId++);
+        }
+    }
+
+    private void sortByDayProjectId(List<EnaTsEntry> entries) {
+        Collections.sort(entries, Comparator.comparing(EnaTsEntry::sortKey));
+    }
+
+    private void sortByEntryId(List<EnaTsEntry> entries) {
+        Collections.sort(entries, Comparator.comparing(o -> o.entryId));
     }
 
     private List<EnaTsEntry> weeklyTotals(List<EnaTsEntry> entries) {

@@ -1,5 +1,6 @@
 package com.aws.codestar.projecttemplates.ena;
 
+import com.aws.codestar.projecttemplates.util.MondayAlignedCalendar;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -10,7 +11,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 import static com.aws.codestar.projecttemplates.util.Time.hoursBetween;
-import static com.aws.codestar.projecttemplates.util.Time.weekOfMonth;
 import static com.aws.codestar.projecttemplates.xl.XlUtil.getLocalTime;
 import static com.aws.codestar.projecttemplates.xl.XlUtil.stringValue;
 
@@ -25,6 +25,7 @@ public class EnaTsEntry implements Comparable<EnaTsEntry> {
     public EnaTsEntry(int lineId, LocalDate month, Row row) {
         this.entryId = (float) lineId;
         this.month = month;
+        this.calendar = new MondayAlignedCalendar(month);
 
         StringBuilder err = new StringBuilder();
         int cellId = 0;
@@ -83,6 +84,8 @@ public class EnaTsEntry implements Comparable<EnaTsEntry> {
     // ToDo: ideally, this should be calculated based on project and activity
     protected static final Float hourlyRate = 60.0f;
 
+    private MondayAlignedCalendar calendar;
+
     private LocalDate month;
     private String projectId = "";
     private String activity = "";
@@ -116,7 +119,7 @@ public class EnaTsEntry implements Comparable<EnaTsEntry> {
 
     @Override
     public int compareTo(EnaTsEntry that) {
-        return (int) Math.signum(this.getEntryId() - that.getEntryId());
+        return this.sortKey().compareTo(that.sortKey());
     }
 
     public String toString() {
@@ -179,7 +182,7 @@ public class EnaTsEntry implements Comparable<EnaTsEntry> {
     }
 
     public String getCharge() {
-        return "$" + decimalFormat.format(charge);
+        return String.format("$%.2f", charge);
     }
 
     protected void setCharge(Float charge) {
@@ -207,6 +210,10 @@ public class EnaTsEntry implements Comparable<EnaTsEntry> {
     }
 
     public int getWeekOfMonth() {
-        return weekOfMonth(date);
+        return calendar.getWeekOfMonth(date);
+    }
+
+    public String sortKey() {
+        return String.format("%05d%s", day, projectId);
     }
 }
