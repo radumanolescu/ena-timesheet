@@ -19,7 +19,7 @@
         <jackson.version>2.14.2</jackson.version>
         <thymeleaf.version>3.1.1.RELEASE</thymeleaf.version>
         <aws.java.sdk.version>2.20.43</aws.java.sdk.version>
-        <hibernate-validator.version>6.0.9.Final</hibernate-validator.version>
+        <hibernate-validator.version>6.0.20.Final</hibernate-validator.version>
     </properties>
 
     <dependencyManagement>
