@@ -5,8 +5,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class UploadController {
-    @GetMapping("/upload")
-    public String uploadForm() {
-        return "upload";
+    @GetMapping("/upload-ena")
+    public String uploadFormENA() {
+        return "upload-ena";
+    }
+    @GetMapping("/upload-phd")
+    public String uploadFormPHD() {
+        return "upload-phd";
     }
 }
