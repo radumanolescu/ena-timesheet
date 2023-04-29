@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>PHD Template</title>
+    <style>
+    /* CSS code to center the form */
+    html, body {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+<div class="container-fluid main-container">
+    <h2>Instructions</h2>
+    <br/><br/><br/>
+    <span>When the ENA timesheet for this same month is ready, upload it at the link below:</span>
+    <br/><br/><br/>
+    <a th:href="@{/upload-ena}">Upload ENA Timesheet</a>
+    <br/><br/><br/>
+
+</div>
+</body>
+</html>
