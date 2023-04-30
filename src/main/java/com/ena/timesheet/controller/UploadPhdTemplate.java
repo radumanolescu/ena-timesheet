@@ -45,6 +45,7 @@ public class UploadPhdTemplate {
         } catch (Exception e) {
             //logger.error("Error uploading file", e);
             System.out.println("Error uploading file");
+            e.printStackTrace();
         }
         return "instructions";
     }

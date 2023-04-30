@@ -9,6 +9,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 
 @DynamoDBTable(tableName = "PhdTemplate")
 public class PhdTemplateDao {
+
     private int yyyyMM;
     private byte[] file_bytes;
 
