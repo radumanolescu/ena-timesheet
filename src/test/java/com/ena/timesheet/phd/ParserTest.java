@@ -13,7 +13,7 @@ public class ParserTest {
     void parse() {
         String filePath = "./src/main/resources/PHD Timesheet 2023-03.xlsx";
         try (InputStream inputStream = new FileInputStream(filePath)) {
-            List<PhdTemplateEntry> entries = new Parser().parse(inputStream);
+            List<PhdTemplateEntry> entries = new Parser().parseEntries(inputStream);
             for (PhdTemplateEntry entry : entries) {
                 System.out.println(entry.toJson());
                 assert entries.size() == 93;

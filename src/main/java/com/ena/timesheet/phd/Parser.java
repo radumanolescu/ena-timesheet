@@ -11,7 +11,13 @@ import java.util.List;
 import java.util.Map;
 
 public class Parser extends ExcelParser {
-    public List<PhdTemplateEntry> parse(InputStream inputStream) throws IOException {
+
+    public PhdTemplate parseTemplate(InputStream inputStream) throws IOException {
+        List<PhdTemplateEntry> entries = parseEntries(inputStream);
+        return new PhdTemplate(entries);
+    }
+
+    public List<PhdTemplateEntry> parseEntries(InputStream inputStream) throws IOException {
         List<PhdTemplateEntry> entries = new ArrayList<>();
         List<String> lines = new ArrayList<>();
         Map<Integer, List<String>> rows = readWorkbook(inputStream, 0);
