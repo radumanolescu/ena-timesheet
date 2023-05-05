@@ -1,25 +1,40 @@
 package com.ena.timesheet.config;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @Configuration
 public class AppConfig {
     @Bean
-    public AmazonDynamoDB dynamoClient() {
+    public DynamoDbClient dynamoClient() throws URISyntaxException {
         String runtimeEnv = getRuntimeEnv();
-        AmazonDynamoDB client = null;
+        return getClient(runtimeEnv);
+    }
+
+    public DynamoDbClient getClient(String runtimeEnv) throws URISyntaxException {
+        ProfileCredentialsProvider credentialsProvider = ProfileCredentialsProvider.create();
+        Region region = Region.US_EAST_1;
+        DynamoDbClient client = null;
         switch (runtimeEnv) {
             case "AWS":
                 System.out.println("Using AWS DynamoDB");
-                client = AmazonDynamoDBClientBuilder.standard().build();
+                client = DynamoDbClient.builder()
+                        .credentialsProvider(credentialsProvider)
+                        .region(region)
+                        .build();
                 break;
             case "dev/local":
                 System.out.println("Using local DynamoDB");
-                client = AmazonDynamoDBClientBuilder.standard()
-                        .withEndpointConfiguration(new AmazonDynamoDBClientBuilder.EndpointConfiguration("http://localhost:8001", "us-east-1"))
+                client = DynamoDbClient.builder()
+                        .credentialsProvider(credentialsProvider)
+                        .region(region)
+                        .endpointOverride(new URI("http://localhost:8001"))
                         .build();
                 break;
             default:
@@ -35,9 +50,5 @@ public class AppConfig {
         }
         return env;
     }
-}
-/* To read data from the DynamoDB:
-            DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
-            PhdTemplateDao dao = mapper.load(PhdTemplateDao.class, yearMonth);
 
-* */
+}
