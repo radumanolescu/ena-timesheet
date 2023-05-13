@@ -6,6 +6,7 @@ package com.ena.timesheet.controller;
 import com.ena.timesheet.dao.PhdDropdownsDao;
 import com.ena.timesheet.dao.PhdTemplateDao;
 import com.ena.timesheet.phd.PhdTemplate;
+import com.ena.timesheet.util.Text;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -57,6 +58,8 @@ public class UploadPhdTemplate {
             //logger.error("Error uploading file", e);
             System.out.println("Error uploading file");
             e.printStackTrace();
+            String stackTrace = Text.stackFormatter2(e);
+            model.addAttribute("stackTrace", stackTrace);
             return "error-phd";
         }
     }

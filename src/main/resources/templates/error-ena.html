@@ -4,19 +4,21 @@
     <meta charset="UTF-8">
   <title>Error</title>
   <style>
-    /* CSS code to center the form */
     html, body {
       height: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
     }
+    pre {
+      font-family: "Courier New", Courier, monospace;
+    }
   </style>
 </head>
 <body>
 <div class="container-fluid main-container">
   <h2>Timesheet errors</h2>
-  (show the errors here)
+  <pre><p th:text="${stackTrace}">This text will be replaced by the th:text parameter.</p></pre>
   <br/><br/><br/>
   <a th:href="@{/upload-ena}">Upload ENA Timesheet</a>
 
