@@ -8,14 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class PhdTemplateDao {
-    public static final String tableName = "PhdTemplate";
+public class PhdDropdownsDao {
+    public static final String tableName = "PhdDropdowns";
     public static final String key = "yyyyMM";
     public static final String fileBytesAttr = "fileBytes";
 
     private final DynamoDbClient ddb;
 
-    public PhdTemplateDao(DynamoDbClient ddb) {
+    public PhdDropdownsDao(DynamoDbClient ddb) {
         this.ddb = ddb;
     }
 
@@ -66,34 +66,4 @@ public class PhdTemplateDao {
         }
     }
 
-    // unused
-    public void printRowData(String keyVal) {
-
-        HashMap<String, AttributeValue> keyToGet = new HashMap<>();
-        keyToGet.put(key, AttributeValue.builder()
-                .s(keyVal)
-                .build());
-
-        GetItemRequest request = GetItemRequest.builder()
-                .key(keyToGet)
-                .tableName(tableName)
-                .build();
-
-        try {
-            Map<String, AttributeValue> returnedItem = ddb.getItem(request).item();
-            if (returnedItem != null) {
-                Set<String> keys = returnedItem.keySet();
-                System.out.println("Amazon DynamoDB table attributes: \n");
-
-                for (String key1 : keys) {
-                    System.out.format("%s: %s\n", key1, returnedItem.get(key1).toString());
-                }
-            } else {
-                System.out.format("No item found with the key %s!\n", key);
-            }
-
-        } catch (DynamoDbException e) {
-            System.err.println(e.getMessage());
-        }
-    }
 }

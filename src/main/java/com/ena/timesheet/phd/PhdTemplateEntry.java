@@ -52,15 +52,19 @@ public class PhdTemplateEntry extends JsonMapped<PhdTemplateEntry> {
      * Valid CSV format requires quotes when string contains commas
      */
     @Transient
-    public String getClientTask() {
-        return "\"" + client + "\",\"" + task + "\"";
+    public String clientCommaTask() {
+        return "\"" + clean(client) + "\",\"" + clean(task) + "\"";
     }
 
     /**
      * A concatenation of `client#task`, stripped of all quotes, separated by #
      */
     @Transient
-    public String getClientConcatTask() {
+    public String clientHashTask() {
         return Text.unquote(client) + "#" + Text.unquote(task);
+    }
+
+    private String clean(String s) {
+        return Text.unquote(s).replaceAll(",", "");
     }
 }
