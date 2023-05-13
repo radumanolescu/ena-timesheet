@@ -33,39 +33,67 @@ public class EnaTsEntry implements Comparable<EnaTsEntry> {
         for (Cell cell : row) {
             switch (cellId) {
                 case 0: // projectId#activity
-                    String projectActivity = stringValue(cell);
-                    String[] pa = projectActivity.split("#");
-                    if (pa.length == 2) {
-                        this.projectId = pa[0];
-                        this.activity = pa[1];
-                        validCells++;
-                    } else {
-                        this.projectId = "";
-                        this.activity = "";
-                        err.append("ProjectActivity must be in the form 'ProjectID#Activity', but was '")
-                                .append(projectActivity).append("'. ");
+                    try {
+                        String projectActivity = stringValue(cell);
+                        String[] pa = projectActivity.split("#");
+                        if (pa.length == 2) {
+                            this.projectId = pa[0];
+                            this.activity = pa[1];
+                            validCells++;
+                        } else {
+                            this.projectId = "";
+                            this.activity = "";
+                            err.append("ProjectActivity must be in the form 'ProjectID#Activity', but was '")
+                                    .append(projectActivity).append("'. ");
+                        }
+                    } catch (Exception e) {
+                        err.append("ProjectActivity must be in the form 'ProjectID#Activity'. ");
                     }
                     break;
                 case 1: // day of month
-                    this.day = (int) cell.getNumericCellValue();
-                    this.date = month.withDayOfMonth(day);
-                    validCells++;
+                    try {
+                        this.day = (int) cell.getNumericCellValue();
+                        this.date = month.withDayOfMonth(day);
+                        validCells++;
+                    } catch (Exception e) {
+                        err.append("Day must be a number. ");
+                    }
                     break;
                 case 2: // start time
-                    this.start = getLocalTime(cell);
-                    validCells++;
+                    try {
+                        this.start = getLocalTime(cell);
+                        validCells++;
+                    } catch (Exception e) {
+                        err.append("Start time must be a time. ");
+                    }
                     break;
                 case 3: // end time
-                    this.end = getLocalTime(cell);
-                    validCells++;
+                    try {
+                        this.end = getLocalTime(cell);
+                        validCells++;
+                    } catch (Exception e) {
+                        err.append("End time must be a time. ");
+                    }
                     break;
                 case 4: // hours
-                    this.hours = Time.hoursBetween(start, end);
-                    validCells++;
+                    try {
+                        this.hours = (float) cell.getNumericCellValue();
+                        validCells++;
+                    } catch (Exception e) {
+                        err.append("Hours must be a number. ");
+                    }
                     break;
                 case 5: // description
-                    this.description = cell.getStringCellValue();
-                    validCells++;
+                    try {
+                        this.description = stringValue(cell);
+                        if (this.description.isEmpty()) {
+                            err.append("Description must be non-empty. ");
+                        } else {
+                            validCells++;
+                        }
+                    } catch (Exception e) {
+                        err.append("Description must be non-empty. ");
+                    }
                     break;
             }
             cellId++;

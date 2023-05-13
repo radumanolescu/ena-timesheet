@@ -36,11 +36,12 @@ public class UploadEnaTimesheet {
             model.addAttribute("invoiceDate", mdyFmt.format(LocalDate.now()));
             model.addAttribute("invoiceByDayAndWeek", bdws);
             model.addAttribute("invoiceByProject", bps);
+            return "invoice";
         } catch (Exception e) {
             //logger.error("Error uploading file", e);
             System.out.println("Error uploading file");
+            return "error-ena";
         }
-        return "invoice";
     }
 
 }

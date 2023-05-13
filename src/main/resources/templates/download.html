@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Download </title>
+  <meta charset="UTF-8">
+  <style>
+    /* CSS code to center the form */
+    html, body {
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+<div class="container-fluid main-container">
+  <h2>Download for <p th:text="${invoiceMonth}">This text will be replaced by the th:text parameter.</p>
+  </h2>
+  <br/><br/><br/>
+  <a th:href="@{/download-phd-dropdowns(yyyyMM=${invoiceMonth})}">PHD drop-downs</a>
+  <br/><br/><br/>
+  <a th:href="@{/download-phd-timesheet(yyyyMM=${invoiceMonth})}">PHD Timesheet</a>
+  <br/><br/><br/>
+  <a th:href="@{/home}">Home</a>
+
+</div>
+</body>
+</html>

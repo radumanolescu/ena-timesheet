@@ -52,7 +52,7 @@
     window.onload = setDatePickerDefault;
   </script>
 <div style="text-align: center;">
-    <h2>Upload ENA Timesheet</h2>
+    <h2>Upload PHD Template</h2>
 
     <form th:action="@{/phd/upload/phd-template}" method="post" id="upload-form" enctype="multipart/form-data" style="text-align: center;">
         <label for="date">Template for month:</label>
@@ -63,6 +63,8 @@
         <br>
         <input type="submit" value="Submit">
     </form>
+    <br/><br/><br/>
+    <a th:href="@{/home}">Home</a>
 </div>
 </body>
 </html>

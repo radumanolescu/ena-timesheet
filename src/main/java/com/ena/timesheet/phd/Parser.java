@@ -3,6 +3,7 @@ package com.ena.timesheet.phd;
 import com.ena.timesheet.util.Text;
 import com.ena.timesheet.xl.ExcelParser;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -12,9 +13,16 @@ import java.util.Map;
 
 public class Parser extends ExcelParser {
 
-    public PhdTemplate parseTemplate(InputStream inputStream) throws IOException {
+    public PhdTemplate parseTemplate(String yearMonth, InputStream inputStream) throws IOException {
         List<PhdTemplateEntry> entries = parseEntries(inputStream);
-        return new PhdTemplate(entries);
+        return new PhdTemplate(yearMonth, entries);
+    }
+
+    public List<PhdTemplateEntry> parseBytes(byte[] fileBytes) throws IOException {
+        ByteArrayInputStream bis = new ByteArrayInputStream(fileBytes);
+        List<PhdTemplateEntry> entries = parseEntries(bis);
+        bis.close();
+        return entries;
     }
 
     public List<PhdTemplateEntry> parseEntries(InputStream inputStream) throws IOException {
