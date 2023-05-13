@@ -1,7 +1,8 @@
 # ----------
 PhdTemplate
+# partition key: yyyyMM
 
-# DDL
+# DDL on Windows
 aws dynamodb create-table --table-name PhdTemplate --attribute-definitions AttributeName=yyyyMM,AttributeType=S --key-schema AttributeName=yyyyMM,KeyType=HASH --endpoint-url http://localhost:8001 --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
 
 # Response
@@ -35,4 +36,10 @@ aws dynamodb create-table --table-name PhdTemplate --attribute-definitions Attri
             }
         }
 # ----------
+PhdDropdowns
+# partition key: yyyyMM
+
+# DDL on Windows
+aws dynamodb create-table --table-name PhdDropdowns --attribute-definitions AttributeName=yyyyMM,AttributeType=S --key-schema AttributeName=yyyyMM,KeyType=HASH --endpoint-url http://localhost:8001 --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
+
 # ----------

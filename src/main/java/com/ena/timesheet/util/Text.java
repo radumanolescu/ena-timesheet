@@ -1,5 +1,7 @@
 package com.ena.timesheet.util;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.HashMap;
@@ -64,6 +66,22 @@ public class Text {
         } catch (NumberFormatException e) {
             return new HashMap.SimpleEntry<>(0.0f, name + " is not a number: " + s + ". ");
         }
+    }
+
+    public static String stackFormatter1(Exception e) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(e.getMessage()).append("\n");
+        for (StackTraceElement ste : e.getStackTrace()) {
+            sb.append(ste.toString()).append("\n");
+        }
+        return sb.toString();
+    }
+
+    public static String stackFormatter2(Exception e) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        e.printStackTrace(pw);
+        return sw.toString();
     }
 
 }
