@@ -1,7 +1,6 @@
 package com.ena.timesheet.ena;
 
 import com.ena.timesheet.util.MondayAlignedCalendar;
-import com.ena.timesheet.util.Time;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
@@ -16,7 +15,9 @@ import static com.ena.timesheet.xl.XlUtil.stringValue;
 
 public class EnaTsEntry implements Comparable<EnaTsEntry> {
 
-    public EnaTsEntry() {
+    public EnaTsEntry(LocalDate month) {
+        this.month = month;
+        this.calendar = new MondayAlignedCalendar(month);
     }
 
     /**
@@ -189,8 +190,12 @@ public class EnaTsEntry implements Comparable<EnaTsEntry> {
         return end;
     }
 
-    public String getHours() {
+    public String formattedHours() {
         return decimalFormat.format(hours);
+    }
+
+    public Double getHours() {
+        return (double) hours;
     }
 
     protected void setHours(Float hours) {
@@ -243,5 +248,12 @@ public class EnaTsEntry implements Comparable<EnaTsEntry> {
 
     public String sortKey() {
         return String.format("%05d%s", day, projectId);
+    }
+
+    /**
+     * Designed to match a corresponding entry in the PHD template
+     */
+    public String matchKey() {
+        return projectId + "#" + activity;
     }
 }

@@ -1,11 +1,14 @@
 package com.ena.timesheet.ena;
 
+import java.time.LocalDate;
+
 /**
  * An entry that represents a total for a week
  */
 public class EnaTsWeekTotalEntry extends EnaTsEntry {
 
-    public EnaTsWeekTotalEntry(float entryId, String hoursLabel, Float totalHours, String chargeLabel, Float totalCharge) {
+    public EnaTsWeekTotalEntry(LocalDate month, float entryId, String hoursLabel, Float totalHours, String chargeLabel, Float totalCharge) {
+        super(month);
         this.hoursLabel = hoursLabel;
         this.chargeLabel = chargeLabel;
         this.setEntryId(entryId);

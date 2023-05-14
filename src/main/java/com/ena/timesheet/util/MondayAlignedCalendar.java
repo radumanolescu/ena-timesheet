@@ -35,4 +35,8 @@ public class MondayAlignedCalendar {
     public Integer getWeekOfMonth(LocalDate date) {
         return weekOfMonth.get(date);
     }
+
+    public static int getDaysInMonth(LocalDate date) {
+        return date.lengthOfMonth();
+    }
 }

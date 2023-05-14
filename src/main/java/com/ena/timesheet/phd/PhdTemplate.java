@@ -11,16 +11,11 @@ public class PhdTemplate {
         this.entries = entries;
     }
 
-    public PhdTemplate(String yearMonth, InputStream inputStream) throws IOException {
-        this.yearMonth = yearMonth;
-        Parser parser = new Parser();
-        this.entries = parser.parseEntries(inputStream);
-    }
-
     public PhdTemplate(String yearMonth, byte[] bytes) throws IOException {
         this.yearMonth = yearMonth;
         Parser parser = new Parser();
         this.entries = parser.parseBytes(bytes);
+        this.xlsxBytes = bytes;
     }
 
     public List<PhdTemplateEntry> getEntries() {
@@ -52,5 +47,15 @@ public class PhdTemplate {
 
     public void setYearMonth(String yearMonth) {
         this.yearMonth = yearMonth;
+    }
+
+    private byte[] xlsxBytes;
+
+    public byte[] getXlsxBytes() {
+        return xlsxBytes;
+    }
+
+    public void setXlsxBytes(byte[] xlsxBytes) {
+        this.xlsxBytes = xlsxBytes;
     }
 }

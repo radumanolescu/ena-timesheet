@@ -4,6 +4,8 @@ import com.ena.timesheet.json.JsonMapped;
 import com.ena.timesheet.util.Text;
 
 import java.beans.Transient;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class PhdTemplateEntry extends JsonMapped<PhdTemplateEntry> {
@@ -13,6 +15,8 @@ public class PhdTemplateEntry extends JsonMapped<PhdTemplateEntry> {
 
     private String client;
     private String task;
+
+    public final Map<Integer, Float> effort = new HashMap<>();
 
     public PhdTemplateEntry(String client, String task) {
         this.client = client;
@@ -57,14 +61,15 @@ public class PhdTemplateEntry extends JsonMapped<PhdTemplateEntry> {
     }
 
     /**
-     * A concatenation of `client#task`, stripped of all quotes, separated by #
+     * A concatenation of `client#task`
      */
     @Transient
     public String clientHashTask() {
-        return Text.unquote(client) + "#" + Text.unquote(task);
+        return client + "#" + task;
     }
 
     private String clean(String s) {
         return Text.unquote(s).replaceAll(",", "");
     }
+
 }

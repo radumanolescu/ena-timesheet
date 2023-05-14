@@ -1,11 +1,14 @@
 package com.ena.timesheet.ena;
 
+import java.time.LocalDate;
+
 /**
  * An entry that represents a blank line in the table
  */
 public class EnaTsWeekBlankEntry extends EnaTsEntry {
 
-    public EnaTsWeekBlankEntry(float entryId) {
+    public EnaTsWeekBlankEntry(LocalDate month, float entryId) {
+        super(month);
         this.setEntryId(entryId);
         this.setProjectId("");
         this.setActivity("");
@@ -18,7 +21,7 @@ public class EnaTsWeekBlankEntry extends EnaTsEntry {
     }
 
     @Override
-    public String getHours() {
+    public String formattedHours() {
         return "";
     }
 
