@@ -5,7 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A calendar that is aligned to Mondays, and has a week number for each day
+ * A calendar that is aligned to Mondays, and has a week number for each day.
+ *
+ * Weeks are defined as Monday through Sunday.
+ *
+ * Week numbers are 1-based.
  */
 public class MondayAlignedCalendar {
     /**

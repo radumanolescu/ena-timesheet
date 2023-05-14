@@ -2,6 +2,8 @@ package com.ena.timesheet.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.ContainerCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -18,7 +20,12 @@ public class AppConfig {
     }
 
     public DynamoDbClient getClient(String runtimeEnv) throws URISyntaxException {
-        ProfileCredentialsProvider credentialsProvider = ProfileCredentialsProvider.create();
+//      ProfileCredentialsProvider credentialsProvider = ProfileCredentialsProvider.create();
+//      ContainerCredentialsProvider credentialsProvider = ContainerCredentialsProvider.builder()
+//              .asyncCredentialUpdateEnabled(true).build();
+        DefaultCredentialsProvider credentialsProvider = DefaultCredentialsProvider.builder()
+                .asyncCredentialUpdateEnabled(true).build();
+
         Region region = Region.US_EAST_1;
         DynamoDbClient client = null;
         switch (runtimeEnv) {
