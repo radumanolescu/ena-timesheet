@@ -30,7 +30,7 @@ public class UploadEnaTimesheet {
             //System.out.println("Controller:Upload " + dateStr + ", " + file.getOriginalFilename() + ", " + file.getSize() + " bytes");
             LocalDate tsMonth = LocalDate.parse(dateStr, formatter);
             EnaTimesheet enaTimesheet = new EnaTimesheet(tsMonth, inputStream);
-            List<EnaTsEntry> bdws = enaTimesheet.getEntries();
+            List<EnaTsEntry> bdws = enaTimesheet.getEntriesWithTotals();
             List<EnaTsProjectEntry> bps = enaTimesheet.getProjectEntries();
             model.addAttribute("invoiceMonth", mmyyFmt.format(tsMonth));
             model.addAttribute("invoiceDate", mdyFmt.format(LocalDate.now()));
