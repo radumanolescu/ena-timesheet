@@ -17,15 +17,28 @@ public class EnaTimesheet {
         List<EnaTsEntry> inputEntries = parseEntries(inputStream, sheetIndex);
         sortByDayProjectId(inputEntries);
         reindexEntries(inputEntries);
-        List<EnaTsEntry> totalEntries = weeklyTotals(inputEntries);
         this.enaTsEntries.addAll(inputEntries);
-        this.enaTsEntries.addAll(totalEntries);
-        sortByEntryId(this.enaTsEntries);
         this.projectEntries.addAll(getProjectEntries(inputEntries));
+    }
+
+    /**
+     * Add pseudo-entries to a separate list of entries to represent the weekly totals,
+     * plus empty lines for invoice formatting.
+     */
+    public List<EnaTsEntry> getEntriesWithTotals() {
+        List<EnaTsEntry> entriesWithTotals = new ArrayList<>();
+        entriesWithTotals.addAll(enaTsEntries);
+        List<EnaTsEntry> totalEntries = weeklyTotals(enaTsEntries);
+        entriesWithTotals.addAll(totalEntries);
+        sortByEntryId(entriesWithTotals);
+        return entriesWithTotals;
     }
 
     private final LocalDate timesheetMonth;
 
+    /**
+     * Entries parsed from the ENA timesheet, without any totals.
+     */
     public List<EnaTsEntry> getEntries() {
         return enaTsEntries;
     }
