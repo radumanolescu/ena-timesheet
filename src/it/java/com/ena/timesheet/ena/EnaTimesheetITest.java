@@ -1,5 +1,6 @@
 package com.ena.timesheet.ena;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -27,24 +28,12 @@ public class EnaTimesheetITest {
         LocalDate invoiceMonth = LocalDate.of(2023, 3, 15);
         try (InputStream inputStream = new FileInputStream(filePath)) {
             EnaTimesheet enaTimesheet = new EnaTimesheet(invoiceMonth, inputStream);
-            assertEquals(enaTimesheet.getEntries().size(), 60);
-            Map<String, Map<Integer, Double>> hoursByCTD = totalHoursByClientTaskDay(enaTimesheet.getEntries());
+            Assertions.assertEquals(enaTimesheet.getEntries().size(), 60);
+            Map<String, Map<Integer, Double>> hoursByCTD = enaTimesheet.totalHoursByClientTaskDay();
             prettyPrint(hoursByCTD);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private Map<String, Map<Integer, Double>> totalHoursByClientTaskDay(List<EnaTsEntry> enaTsEntries) {
-        return enaTsEntries.stream().collect(
-                groupingBy(
-                        EnaTsEntry::projectActivity,
-                        groupingBy(
-                                EnaTsEntry::getDay,
-                                summingDouble(EnaTsEntry -> EnaTsEntry.hours)
-                        )
-                )
-        );
     }
 
     private void prettyPrint(Map<String, Map<Integer, Double>> map) {

@@ -29,8 +29,7 @@ public class EnaTimesheet {
      * plus empty lines for invoice formatting.
      */
     public List<EnaTsEntry> getEntriesWithTotals() {
-        List<EnaTsEntry> entriesWithTotals = new ArrayList<>();
-        entriesWithTotals.addAll(enaTsEntries);
+        List<EnaTsEntry> entriesWithTotals = new ArrayList<>(enaTsEntries);
         List<EnaTsEntry> totalEntries = weeklyTotals(enaTsEntries);
         entriesWithTotals.addAll(totalEntries);
         sortByEntryId(entriesWithTotals);
@@ -80,11 +79,11 @@ public class EnaTimesheet {
     }
 
     private void sortByDayProjectId(List<EnaTsEntry> entries) {
-        Collections.sort(entries, Comparator.comparing(EnaTsEntry::sortKey));
+        entries.sort(Comparator.comparing(EnaTsEntry::sortKey));
     }
 
     private void sortByEntryId(List<EnaTsEntry> entries) {
-        Collections.sort(entries, Comparator.comparing(o -> o.entryId));
+        entries.sort(Comparator.comparing(o -> o.entryId));
     }
 
     private List<EnaTsEntry> weeklyTotals(List<EnaTsEntry> entries) {
