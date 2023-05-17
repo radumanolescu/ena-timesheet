@@ -10,6 +10,9 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.*;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.summingDouble;
+
 public class EnaTimesheet {
     public EnaTimesheet(LocalDate timesheetMonth, InputStream inputStream) {
         this.timesheetMonth = timesheetMonth;
@@ -138,7 +141,7 @@ public class EnaTimesheet {
         float totalHours = 0.0f;
         Map<String, EnaTsProjectEntry> projectEntryMap = new HashMap<>();
         for (EnaTsEntry entry : entries) {
-            String projectActivity = entry.getProjectId() + "#" + entry.getActivity();
+            String projectActivity = entry.projectActivity();
             EnaTsProjectEntry projectEntry = projectEntryMap.getOrDefault(projectActivity, new EnaTsProjectEntry(entry.getProjectId(), entry.getActivity(), 0.0f));
             projectEntry.setHours(projectEntry.hours + entry.hours);
             totalHours += entry.hours;
@@ -150,5 +153,17 @@ public class EnaTimesheet {
         Collections.sort(projectEntries);
         projectEntries.add(new EnaTsProjectEntry("Total hours:", "", totalHours));
         return projectEntries;
+    }
+
+    public Map<String, Map<Integer, Double>> totalHoursByClientTaskDay() {
+        return enaTsEntries.stream().collect(
+                groupingBy(
+                        EnaTsEntry::projectActivity,
+                        groupingBy(
+                                EnaTsEntry::getDay,
+                                summingDouble(EnaTsEntry -> EnaTsEntry.hours)
+                        )
+                )
+        );
     }
 }

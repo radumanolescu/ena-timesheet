@@ -244,4 +244,11 @@ public class EnaTsEntry implements Comparable<EnaTsEntry> {
     public String sortKey() {
         return String.format("%05d%s", day, projectId);
     }
+
+    /**
+     * Designed to match a corresponding entry in the PHD template
+     */
+    public String projectActivity() {
+        return projectId + "#" + activity;
+    }
 }
