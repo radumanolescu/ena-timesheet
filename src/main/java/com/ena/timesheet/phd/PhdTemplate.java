@@ -23,13 +23,13 @@ public class PhdTemplate {
 
     public PhdTemplate(String yearMonth, InputStream inputStream) throws IOException {
         this.yearMonth = yearMonth;
-        Parser2 parser = new Parser2();
+        Parser parser = new Parser();
         this.entries = parser.parseEntries(inputStream);
     }
 
     public PhdTemplate(String yearMonth, byte[] bytes) throws IOException {
         this.yearMonth = yearMonth;
-        Parser2 parser = new Parser2();
+        Parser parser = new Parser();
         this.entries = parser.parseBytes(bytes);
         this.xlsxBytes = bytes;
     }
@@ -37,7 +37,7 @@ public class PhdTemplate {
     public PhdTemplate(String yearMonth, File phdTemplateFile) throws IOException {
         this.yearMonth = yearMonth;
         try (InputStream inputStream = new FileInputStream(phdTemplateFile)) {
-            Parser2 parser = new Parser2();
+            Parser parser = new Parser();
             this.entries = parser.parseEntries(inputStream);
         } catch (Exception e) {
             throw e;

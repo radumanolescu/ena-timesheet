@@ -2,6 +2,7 @@ package com.ena.timesheet.phd;
 
 import com.ena.timesheet.json.JsonMapped;
 import com.ena.timesheet.util.Text;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.beans.Transient;
 import java.util.Map;
@@ -94,6 +95,7 @@ public class PhdTemplateEntry extends JsonMapped<PhdTemplateEntry> {
         this.rowNum = rowNum;
     }
 
+    @JsonIgnore
     public boolean isBlank() {
         return Text.isBlank(client) && Text.isBlank(task);
     }

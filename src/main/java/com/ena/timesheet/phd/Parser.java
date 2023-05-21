@@ -1,15 +1,20 @@
 package com.ena.timesheet.phd;
 
-import com.ena.timesheet.util.Text;
 import com.ena.timesheet.xl.ExcelParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+
+import static com.ena.timesheet.util.Text.replaceNonAscii;
+import static com.ena.timesheet.xl.XlUtil.stringValue;
 
 public class Parser extends ExcelParser {
 
@@ -26,94 +31,81 @@ public class Parser extends ExcelParser {
     }
 
     public List<PhdTemplateEntry> parseEntries(InputStream inputStream) throws IOException {
-        List<String> lines = new ArrayList<>();
-        Map<Integer, List<String>> rows = readWorkbook(inputStream, 0);
-        boolean stop = false;
-        for (List<String> row : rows.values()) {
-            if (row.get(0).equals("SUM")) {
-                stop = true;
+        List<PhdTemplateEntry> entries = new ArrayList<>();
+        Workbook workbook = WorkbookFactory.create(inputStream);
+        int index = 0; // first sheet
+        Sheet sheet = workbook.getSheetAt(index);
+        int i = 0;
+        for (Row row : sheet) {
+            String client = stringValue(row.getCell(0)).trim();
+            if (client.equals("SUM")) {
+                break;
             }
-            if (row.size() > 1 && !stop) {
-                String rawLine = row.get(0) + "\t" + row.get(1);
-                String line = Text.replaceNonAscii(rawLine);
-                lines.add(line);
-            }
+            String task = stringValue(row.getCell(1)).trim();
+            entries.add(new PhdTemplateEntry(i, replaceNonAscii(client), replaceNonAscii(task)));
+            i++;
         }
-        return setProjectCodes(lines);
+        setProjectCodes(entries);
+        return entries;
     }
 
-    public List<PhdTemplateEntry> setProjectCodes(List<String> lines) {
-        List<String[]> worksheet = new ArrayList<>();
+    public void setProjectCodes(List<PhdTemplateEntry> lines) throws JsonProcessingException {
         String projectCde = "";
         int projectBgn = -1;
         int projectEnd = -1;
 
         int numLin = lines.size();
-        while (lines.get(numLin - 1).length() < 2) {
-            numLin--; // remove last lines if they are empty
+        while (lines.get(numLin - 1).isBlank()) {
+            lines.remove(numLin - 1); // remove last lines if they are empty
+            numLin--;
         }
         for (int lineNum = numLin - 1; lineNum >= 0; lineNum--) {
-            worksheet.add(new String[2]);
-        }
-        for (int lineNum = numLin - 1; lineNum >= 0; lineNum--) {
-            worksheet.get(lineNum)[0] = "";
-            worksheet.get(lineNum)[1] = "";
-            String[] words = lines.get(lineNum).trim().split("\t");
-            int numWords = words.length;
-
+            p(lines.get(lineNum), projectCde, projectBgn, projectEnd);
+            int numWords = lines.get(lineNum).numWords();
             switch (numWords) {
-                case 1:
-                    worksheet.get(lineNum)[1] = words[0].trim(); // set activity = word
-                    if (words[0].trim().isEmpty()) {
-                        projectBgn = lineNum + 1;
-                        p(words, projectCde, projectBgn, projectEnd);
-                        s(projectCde, projectBgn, projectEnd, worksheet);
-                        projectBgn = -1;
-                        projectEnd = -1;
-                        projectCde = "";
-                    } else {
-                        if (projectEnd < 0) {
-                            projectEnd = lineNum;
-                        }
+                case 0: // empty line between groups
+                    projectBgn = lineNum + 1;
+                    s(projectCde, projectBgn, projectEnd, lines);
+                    p(lines.get(lineNum), projectCde, projectBgn, projectEnd);
+                    projectBgn = -1;
+                    projectEnd = -1;
+                    projectCde = "";
+                    break;
+                case 1: // activity line
+                    if (projectEnd < 0) {
+                        projectEnd = lineNum;
                     }
                     break;
                 default: // numWords == 2
-                    worksheet.get(lineNum)[1] = words[1].trim();
                     if (projectCde.isEmpty()) {
-                        projectCde = words[0];
+                        projectCde = lines.get(lineNum).getClient();
                     }
                     if (projectEnd < 0) {
                         projectEnd = lineNum;
                     }
                     break;
             }
-
-            p(words, projectCde, projectBgn, projectEnd);
             if (lineNum == 0) {
                 projectBgn = 1;
-                p(words, projectCde, projectBgn, projectEnd);
-                s(projectCde, projectBgn, projectEnd, worksheet);
+                s(projectCde, projectBgn, projectEnd, lines);
             }
+            p(lines.get(lineNum), projectCde, projectBgn, projectEnd);
         }
-
-        List<PhdTemplateEntry> entries = new ArrayList<>();
-        int i = 0;
-        for (String[] row : worksheet) {
-            entries.add(new PhdTemplateEntry(i++, row[0], row[1]));
-        }
-
-        return entries;
     }
 
-    private void p(String[] w, String pC, int pB, int pE) {
-        String ws = Arrays.toString(w);
-        String ps = w.length + "," + pC + ":(" + pB + "," + pE + ")";
-        // System.out.println(ws + ps);
+    private void p(PhdTemplateEntry w, String pC, int pB, int pE) throws JsonProcessingException {
+        String ws = w.toJson();
+        int xl = w.getRowNum() + 1;
+        String ps = "{xl=" + xl + ",w=" + w.numWords() + ",c=`" + pC + "`,b=" + pB + ",e=" + pE + "}";
+//        System.out.println(ws + "\t\t" + ps);
     }
 
-    private void s(String pC, int pB, int pE, List<String[]> worksheet) {
+    private void s(String pC, int pB, int pE, List<PhdTemplateEntry> worksheet) {
+        if (pC.isEmpty() || pB < 0 || pE < 0) {
+            return;
+        }
         for (int lineNum = pB; lineNum <= pE; lineNum++) {
-            worksheet.get(lineNum)[0] = pC;
+            worksheet.get(lineNum).setClient(pC);
         }
     }
 

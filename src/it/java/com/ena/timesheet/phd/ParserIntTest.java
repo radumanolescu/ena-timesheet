@@ -25,7 +25,7 @@ public class ParserIntTest extends IntTest {
     void parse() throws URISyntaxException {
         File phdFile = new File(findFile(phdFilePath));
         try (InputStream inputStream = new FileInputStream(phdFile)) {
-            List<PhdTemplateEntry> entries = new Parser2().parseEntries(inputStream);
+            List<PhdTemplateEntry> entries = new Parser().parseEntries(inputStream);
             for (PhdTemplateEntry entry : entries) {
 //                System.out.println(entry.toJson());
                 assertEquals(entries.size(), 93);
