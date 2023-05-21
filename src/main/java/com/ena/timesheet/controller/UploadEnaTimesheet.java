@@ -6,6 +6,7 @@ package com.ena.timesheet.controller;
 import com.ena.timesheet.ena.EnaTimesheet;
 import com.ena.timesheet.ena.EnaTsEntry;
 import com.ena.timesheet.ena.EnaTsProjectEntry;
+import com.ena.timesheet.util.Text;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,6 +41,9 @@ public class UploadEnaTimesheet {
         } catch (Exception e) {
             //logger.error("Error uploading file", e);
             System.out.println("Error uploading file");
+            e.printStackTrace();
+            String stackTrace = Text.stackFormatter2(e);
+            model.addAttribute("stackTrace", stackTrace);
             return "error-ena";
         }
     }

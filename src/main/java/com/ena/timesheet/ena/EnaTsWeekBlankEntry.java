@@ -18,7 +18,7 @@ public class EnaTsWeekBlankEntry extends EnaTsEntry {
     }
 
     @Override
-    public String getHours() {
+    public String formattedHours() {
         return "";
     }
 

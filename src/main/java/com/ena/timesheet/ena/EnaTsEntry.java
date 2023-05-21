@@ -188,8 +188,12 @@ public class EnaTsEntry implements Comparable<EnaTsEntry> {
         return end;
     }
 
-    public String getHours() {
+    public String formattedHours() {
         return decimalFormat.format(hours);
+    }
+
+    public Float getHours() {
+        return hours;
     }
 
     protected void setHours(Float hours) {

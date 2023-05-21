@@ -84,4 +84,8 @@ public class Text {
         return sw.toString();
     }
 
+    public static boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+
 }

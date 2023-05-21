@@ -5,6 +5,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -22,6 +24,20 @@ public class EnaTimesheet {
         reindexEntries(inputEntries);
         this.enaTsEntries.addAll(inputEntries);
         this.projectEntries.addAll(getProjectEntries(inputEntries));
+    }
+
+    public EnaTimesheet(LocalDate timesheetMonth, File enaTimesheetFile) throws IOException {
+        this.timesheetMonth = timesheetMonth;
+        try (InputStream inputStream = new FileInputStream(enaTimesheetFile)) {
+            int sheetIndex = 0; // Assume it's the first sheet
+            List<EnaTsEntry> inputEntries = parseEntries(inputStream, sheetIndex);
+            sortByDayProjectId(inputEntries);
+            reindexEntries(inputEntries);
+            this.enaTsEntries.addAll(inputEntries);
+            this.projectEntries.addAll(getProjectEntries(inputEntries));
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     /**
@@ -152,6 +168,10 @@ public class EnaTimesheet {
         Collections.sort(projectEntries);
         projectEntries.add(new EnaTsProjectEntry("Total hours:", "", totalHours));
         return projectEntries;
+    }
+
+    public double totalHours() {
+        return enaTsEntries.stream().mapToDouble(EnaTsEntry::getHours).sum();
     }
 
     public Map<String, Map<Integer, Double>> totalHoursByClientTaskDay() {

@@ -26,7 +26,6 @@ public class Parser extends ExcelParser {
     }
 
     public List<PhdTemplateEntry> parseEntries(InputStream inputStream) throws IOException {
-        List<PhdTemplateEntry> entries = new ArrayList<>();
         List<String> lines = new ArrayList<>();
         Map<Integer, List<String>> rows = readWorkbook(inputStream, 0);
         boolean stop = false;
@@ -64,7 +63,7 @@ public class Parser extends ExcelParser {
 
             switch (numWords) {
                 case 1:
-                    worksheet.get(lineNum)[1] = words[0].trim();
+                    worksheet.get(lineNum)[1] = words[0].trim(); // set activity = word
                     if (words[0].trim().isEmpty()) {
                         projectBgn = lineNum + 1;
                         p(words, projectCde, projectBgn, projectEnd);
@@ -78,7 +77,7 @@ public class Parser extends ExcelParser {
                         }
                     }
                     break;
-                default:
+                default: // numWords == 2
                     worksheet.get(lineNum)[1] = words[1].trim();
                     if (projectCde.isEmpty()) {
                         projectCde = words[0];
@@ -98,15 +97,16 @@ public class Parser extends ExcelParser {
         }
 
         List<PhdTemplateEntry> entries = new ArrayList<>();
+        int i = 0;
         for (String[] row : worksheet) {
-            entries.add(new PhdTemplateEntry(row[0], row[1]));
+            entries.add(new PhdTemplateEntry(i++, row[0], row[1]));
         }
 
         return entries;
     }
 
     private void p(String[] w, String pC, int pB, int pE) {
-        String ws = Arrays.toString(w).replace(", ", "|||").replace("[", "[").replace("]", "]");
+        String ws = Arrays.toString(w);
         String ps = w.length + "," + pC + ":(" + pB + "," + pE + ")";
         // System.out.println(ws + ps);
     }

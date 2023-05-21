@@ -8,25 +8,29 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class EnaTimesheetITest {
-    public static String filePath = "./src/it/resources/PHD 03 - Mar 2023.xlsx";
+public class EnaTimesheetIntTest {
+    public static final String filePath = "PHD 03 - Mar 2023.xlsx";
+    public static final LocalDate march2023 = LocalDate.of(2023, 3, 15);
 
     @Test
     @DisplayName("Parse an ENA timesheet")
-    void parse() {
-        File file = new File(filePath);
+    void parse() throws URISyntaxException {
+        File file = new File(findFile(filePath));
         assertTrue(file.exists());
-        LocalDate invoiceMonth = LocalDate.of(2023, 3, 15);
-        try (InputStream inputStream = new FileInputStream(filePath)) {
-            EnaTimesheet enaTimesheet = new EnaTimesheet(invoiceMonth, inputStream);
-            Assertions.assertEquals(enaTimesheet.getEntries().size(), 60);
+        try (InputStream inputStream = new FileInputStream(file)) {
+            EnaTimesheet enaTimesheet = new EnaTimesheet(march2023, inputStream);
+            Assertions.assertEquals(60, enaTimesheet.getEntries().size());
+            Assertions.assertEquals(77, enaTimesheet.getEntriesWithTotals().size());
             Map<String, Map<Integer, Double>> hoursByCTD = enaTimesheet.totalHoursByClientTaskDay();
-            prettyPrint(hoursByCTD);
+            // prettyPrint(hoursByCTD);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -43,6 +47,12 @@ public class EnaTimesheetITest {
                 System.out.println("  " + innerKey + ": " + value);
             }
         }
+    }
+
+    private URI findFile(String fileName) throws URISyntaxException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL resource = classLoader.getResource(fileName);
+        return resource.toURI();
     }
 }
 

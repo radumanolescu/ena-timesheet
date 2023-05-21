@@ -3,11 +3,14 @@ package com.ena.timesheet.xl;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 
 public class XlUtil {
+    public static final DecimalFormat decimalFormat = new DecimalFormat("#.##");
+
     public static LocalDate getLocalDate(Cell cell) {
         return cell.getDateCellValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
@@ -35,7 +38,7 @@ public class XlUtil {
         if (DateUtil.isCellDateFormatted(cell)) {
             return cell.getDateCellValue() + "";
         } else {
-            return cell.getNumericCellValue() + "";
+            return decimalFormat.format(cell.getNumericCellValue());
         }
     }
 
