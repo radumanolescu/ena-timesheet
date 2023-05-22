@@ -27,7 +27,7 @@ public class ParserIntTest extends IntTest {
         try (InputStream inputStream = new FileInputStream(phdFile)) {
             List<PhdTemplateEntry> entries = new Parser().parseEntries(inputStream);
             for (PhdTemplateEntry entry : entries) {
-//                System.out.println(entry.toJson());
+                System.out.println(entry.toJson());
                 assertEquals(entries.size(), 93);
             }
         } catch (IOException e) {

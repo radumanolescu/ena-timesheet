@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,6 +32,8 @@ public class TimesheetUpdaterIntTest {
         double enaTotalHours = enaTimesheet.totalHours();
         double phdTotalHours = phdTemplate.totalHours();
         assertEquals(enaTotalHours, phdTotalHours);
+        File tempFile = new File("/tmp/PhdTimesheet-WithEffort.xlsx");;
+        Files.write(tempFile.toPath(), phdTemplate.getXlsxBytes());
     }
 
     private URI findFile(String fileName) throws URISyntaxException {

@@ -9,6 +9,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +24,9 @@ public class PhdTemplate {
 
     public PhdTemplate(String yearMonth, InputStream inputStream) throws IOException {
         this.yearMonth = yearMonth;
+        this.xlsxBytes = getBytes(inputStream);
         Parser parser = new Parser();
-        this.entries = parser.parseEntries(inputStream);
+        this.entries = parser.parseBytes(xlsxBytes);
     }
 
     public PhdTemplate(String yearMonth, byte[] bytes) throws IOException {
@@ -39,6 +41,7 @@ public class PhdTemplate {
         try (InputStream inputStream = new FileInputStream(phdTemplateFile)) {
             Parser parser = new Parser();
             this.entries = parser.parseEntries(inputStream);
+            this.xlsxBytes = Files.readAllBytes(phdTemplateFile.toPath());
         } catch (Exception e) {
             throw e;
         }
@@ -112,6 +115,7 @@ public class PhdTemplate {
         if (enaTotalHours != phdTotalHours) {
             throw new RuntimeException("Total hours mismatch: ENA=" + enaTotalHours + " PHD=" + phdTotalHours);
         }
+        updateXlsx(0);
     }
 
     public void checkTasks(EnaTimesheet enaTimesheet) {
@@ -124,17 +128,44 @@ public class PhdTemplate {
         }
     }
 
+    // In the spreadsheet, the column for day 1 of the month is column 3 in Excel ie row.getCell(2)
+    private static final int colOffset = 1;
+
     public void updateXlsx(int index) {
         if (xlsxBytes == null) return;
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(xlsxBytes)) {
             Workbook workbook = WorkbookFactory.create(inputStream);
             Sheet sheet = workbook.getSheetAt(index);
+            int rowId = 0;
+            int numEntries = entries.size();
             for (Row row : sheet) {
-                //row.getCell()
+                if (rowId >= numEntries) break;
+                PhdTemplateEntry entry = entries.get(rowId);
+                for (Map.Entry<Integer, Double> dayEffort : entry.getEffort().entrySet()) {
+                    int day = dayEffort.getKey();
+                    double effort = dayEffort.getValue();
+                    row.getCell(colOffset + day).setCellValue(effort);
+                }
+                rowId++;
             }
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            xlsxBytes = outputStream.toByteArray();
+            outputStream.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public byte[] getBytes(InputStream inputStream) {
+        byte[] bytes = null;
+        try {
+            bytes = new byte[inputStream.available()];
+            inputStream.read(bytes);
+        } catch (Exception e) {
+            System.out.println("Error converting InputStream to byte[]");
+        }
+        return bytes;
     }
 
 }

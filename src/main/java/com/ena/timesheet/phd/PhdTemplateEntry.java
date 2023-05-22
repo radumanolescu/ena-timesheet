@@ -100,10 +100,9 @@ public class PhdTemplateEntry extends JsonMapped<PhdTemplateEntry> {
         return Text.isBlank(client) && Text.isBlank(task);
     }
 
-    public int numWords() {
-        int n = 0;
-        if (!Text.isBlank(client)) n++;
-        if (!Text.isBlank(task)) n++;
-        return n;
+    public String entryType(){
+        String cl = Text.isBlank(client) ? "null" : "Client";
+        String tk = Text.isBlank(task) ? "null" : "Task";
+        return cl + "_" + tk;
     }
 }

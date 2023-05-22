@@ -49,54 +49,67 @@ public class Parser extends ExcelParser {
         return entries;
     }
 
-    public void setProjectCodes(List<PhdTemplateEntry> lines) throws JsonProcessingException {
+    public void setProjectCodes(List<PhdTemplateEntry> entries) throws JsonProcessingException {
         String projectCde = "";
         int projectBgn = -1;
         int projectEnd = -1;
 
-        int numLin = lines.size();
-        while (lines.get(numLin - 1).isBlank()) {
-            lines.remove(numLin - 1); // remove last lines if they are empty
+        int numLin = entries.size();
+        while (entries.get(numLin - 1).isBlank()) {
+            entries.remove(numLin - 1); // remove last entries if they are empty
             numLin--;
         }
+        // Starting from the last line, find the project code and boundaries ([start,end] line IDs).
+        // Once found, set the project code for all the entries in the project.
         for (int lineNum = numLin - 1; lineNum >= 0; lineNum--) {
-            p(lines.get(lineNum), projectCde, projectBgn, projectEnd);
-            int numWords = lines.get(lineNum).numWords();
-            switch (numWords) {
-                case 0: // empty line between groups
-                    projectBgn = lineNum + 1;
-                    s(projectCde, projectBgn, projectEnd, lines);
-                    p(lines.get(lineNum), projectCde, projectBgn, projectEnd);
+            p(entries.get(lineNum), projectCde, projectBgn, projectEnd);
+            String entryType = entries.get(lineNum).entryType();
+            switch (entryType) {
+                case "null_null": // empty line between groups
+                    // The first empty line after a project group indicates that the project begins at the next line.
+                    if (projectBgn < 0) {
+                        projectBgn = lineNum + 1;
+                    }
+                    // So set the project code for all the entries in the project
+                    s(projectCde, projectBgn, projectEnd, entries);
+                    p(entries.get(lineNum), projectCde, projectBgn, projectEnd);
+                    // Reset the project code and boundaries
                     projectBgn = -1;
                     projectEnd = -1;
                     projectCde = "";
                     break;
-                case 1: // activity line
+                case "null_Task": // activity line
+                    // If we have encountered an activity but the project is undefined,
+                    // it means we have encountered a new project.
                     if (projectEnd < 0) {
                         projectEnd = lineNum;
                     }
                     break;
-                default: // numWords == 2
+                case "Client_Task":
+                    // The project code is the first word of the line,
+                    // in the last entry of the group that has a non-empty value in that field.
                     if (projectCde.isEmpty()) {
-                        projectCde = lines.get(lineNum).getClient();
+                        projectCde = entries.get(lineNum).getClient();
                     }
                     if (projectEnd < 0) {
                         projectEnd = lineNum;
                     }
                     break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + entryType);
             }
             if (lineNum == 0) {
                 projectBgn = 1;
-                s(projectCde, projectBgn, projectEnd, lines);
+                s(projectCde, projectBgn, projectEnd, entries);
             }
-            p(lines.get(lineNum), projectCde, projectBgn, projectEnd);
+            p(entries.get(lineNum), projectCde, projectBgn, projectEnd);
         }
     }
 
     private void p(PhdTemplateEntry w, String pC, int pB, int pE) throws JsonProcessingException {
         String ws = w.toJson();
         int xl = w.getRowNum() + 1;
-        String ps = "{xl=" + xl + ",w=" + w.numWords() + ",c=`" + pC + "`,b=" + pB + ",e=" + pE + "}";
+        String ps = "{xl=" + xl + ",t=" + w.entryType() + ",c=`" + pC + "`,b=" + pB + ",e=" + pE + "}";
 //        System.out.println(ws + "\t\t" + ps);
     }
 
