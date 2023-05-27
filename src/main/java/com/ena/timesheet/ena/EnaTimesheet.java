@@ -5,10 +5,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -18,26 +15,34 @@ import static java.util.stream.Collectors.summingDouble;
 public class EnaTimesheet {
     public EnaTimesheet(LocalDate timesheetMonth, InputStream inputStream) {
         this.timesheetMonth = timesheetMonth;
+        parseSortReindex(inputStream);
+    }
+
+    public EnaTimesheet(LocalDate timesheetMonth, File enaTimesheetFile) throws IOException {
+        this.timesheetMonth = timesheetMonth;
+        try (InputStream inputStream = new FileInputStream(enaTimesheetFile)) {
+            parseSortReindex(inputStream);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public EnaTimesheet(LocalDate timesheetMonth, byte[] fileBytes) throws IOException {
+        this.timesheetMonth = timesheetMonth;
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(fileBytes)) {
+            parseSortReindex(bis);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    private void parseSortReindex(InputStream inputStream){
         int sheetIndex = 0; // Assume it's the first sheet
         List<EnaTsEntry> inputEntries = parseEntries(inputStream, sheetIndex);
         sortByDayProjectId(inputEntries);
         reindexEntries(inputEntries);
         this.enaTsEntries.addAll(inputEntries);
         this.projectEntries.addAll(getProjectEntries(inputEntries));
-    }
-
-    public EnaTimesheet(LocalDate timesheetMonth, File enaTimesheetFile) throws IOException {
-        this.timesheetMonth = timesheetMonth;
-        try (InputStream inputStream = new FileInputStream(enaTimesheetFile)) {
-            int sheetIndex = 0; // Assume it's the first sheet
-            List<EnaTsEntry> inputEntries = parseEntries(inputStream, sheetIndex);
-            sortByDayProjectId(inputEntries);
-            reindexEntries(inputEntries);
-            this.enaTsEntries.addAll(inputEntries);
-            this.projectEntries.addAll(getProjectEntries(inputEntries));
-        } catch (Exception e) {
-            throw e;
-        }
     }
 
     /**

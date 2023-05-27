@@ -137,12 +137,6 @@
             <version>${aws.java.sdk.version}</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <artifactId>aws-java-sdk-dynamodb</artifactId>-->
-<!--            <groupId>com.amazonaws</groupId>-->
-<!--            <version>1.12.429</version>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-commons</artifactId>
@@ -181,6 +175,12 @@
             <version>${jackson.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${org.springframework.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
