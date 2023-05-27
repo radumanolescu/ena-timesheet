@@ -31,12 +31,7 @@ public class UploadEnaTimesheet {
             //System.out.println("Controller:Upload " + dateStr + ", " + file.getOriginalFilename() + ", " + file.getSize() + " bytes");
             LocalDate tsMonth = LocalDate.parse(dateStr, formatter);
             EnaTimesheet enaTimesheet = new EnaTimesheet(tsMonth, inputStream);
-            List<EnaTsEntry> bdws = enaTimesheet.getEntriesWithTotals();
-            List<EnaTsProjectEntry> bps = enaTimesheet.getProjectEntries();
-            model.addAttribute("invoiceMonth", mmyyFmt.format(tsMonth));
-            model.addAttribute("invoiceDate", mdyFmt.format(LocalDate.now()));
-            model.addAttribute("invoiceByDayAndWeek", bdws);
-            model.addAttribute("invoiceByProject", bps);
+            prepareModelForDisplay(tsMonth, enaTimesheet, model);
             return "invoice";
         } catch (Exception e) {
             //logger.error("Error uploading file", e);
@@ -46,6 +41,15 @@ public class UploadEnaTimesheet {
             model.addAttribute("stackTrace", stackTrace);
             return "error-ena";
         }
+    }
+
+    private void prepareModelForDisplay(LocalDate tsMonth, EnaTimesheet enaTimesheet, Model model) {
+        List<EnaTsEntry> bdws = enaTimesheet.getEntriesWithTotals();
+        List<EnaTsProjectEntry> bps = enaTimesheet.getProjectEntries();
+        model.addAttribute("invoiceMonth", mmyyFmt.format(tsMonth));
+        model.addAttribute("invoiceDate", mdyFmt.format(LocalDate.now()));
+        model.addAttribute("invoiceByDayAndWeek", bdws);
+        model.addAttribute("invoiceByProject", bps);
     }
 
 }
