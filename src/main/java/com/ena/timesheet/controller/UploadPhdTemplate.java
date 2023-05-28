@@ -13,12 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 import java.io.InputStream;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 @Controller
 public class UploadPhdTemplate extends PhdUploadFlow {
-    private static final DateTimeFormatter mmyyFmt = DateTimeFormatter.ofPattern("MMMM yyyy");
 
     private final DynamoDbClient dynamoDBClient;
 
@@ -32,7 +29,7 @@ public class UploadPhdTemplate extends PhdUploadFlow {
         try (InputStream inputStream = file.getInputStream()) {
             String yyyyMM = getYearMonth(dateStr);
             saveTemplateAndDropdowns(yyyyMM, inputStream, dynamoDBClient);
-            model.addAttribute("invoiceMonth", yyyyMM);
+            prepareModelForDisplay(dateStr, model);
             return "download";
         } catch (Exception e) {
             //logger.error("Error uploading file", e);
@@ -44,8 +41,8 @@ public class UploadPhdTemplate extends PhdUploadFlow {
         }
     }
 
-    private String getMonthYear(String dateStr) {
-        LocalDate tsMonth = LocalDate.parse(dateStr, yyyyMMdd);
-        return mmyyFmt.format(tsMonth);
+    private void prepareModelForDisplay(String dateStr, Model model) {
+        model.addAttribute("monthYear", getMonthYear(dateStr));
+        model.addAttribute("yyyyMM", getYearMonth(dateStr));
     }
 }

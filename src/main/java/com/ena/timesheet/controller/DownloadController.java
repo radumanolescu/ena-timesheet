@@ -26,11 +26,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
-public class DownloadController {
+public class DownloadController extends ControllerBase {
     private static final String dropdownsFilename = "ena_dropdown.txt";
-    private static final DateTimeFormatter mmyyFmt = DateTimeFormatter.ofPattern("MMMM yyyy");
     private static final DateTimeFormatter mdyFmt = DateTimeFormatter.ofPattern("MMMM d, yyyy");
-    private static final DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final DateTimeFormatter yyyyMMddFmt = DateTimeFormatter.ofPattern("yyyyMMdd");
     private final DynamoDbClient dynamoDBClient;
 
     @Autowired
@@ -92,6 +91,9 @@ public class DownloadController {
         }
     }
 
+    /**
+     * Provide parameters for the invoice.html template.
+     * */
     private void prepareModelForDisplay(LocalDate tsMonth, EnaTimesheet enaTimesheet, Model model) {
         List<EnaTsEntry> bdws = enaTimesheet.getEntriesWithTotals();
         List<EnaTsProjectEntry> bps = enaTimesheet.getProjectEntries();
@@ -107,6 +109,6 @@ public class DownloadController {
     }
 
     private LocalDate invoiceMonth(String yyyyMM) {
-        return LocalDate.parse(yyyyMM + "01", yyyyMMdd);
+        return LocalDate.parse(yyyyMM + "01", yyyyMMddFmt);
     }
 }

@@ -15,14 +15,14 @@
 </head>
 <body>
 <div class="container-fluid main-container">
-  <h2>Download for <p th:text="${invoiceMonth}">This text will be replaced by the th:text parameter.</p>
+  <h2>Downloads for <p th:text="${monthYear}">This text will be replaced by the th:text parameter.</p>
   </h2>
   <br/><br/><br/>
-  <a th:href="@{/download-phd-dropdowns(yyyyMM=${invoiceMonth})}">PHD drop-downs</a>
+  <a th:href="@{/download-phd-dropdowns(yyyyMM=${yyyyMM})}">PHD drop-downs</a>
   <br/><br/><br/>
-  <a th:href="@{/download-phd-timesheet(yyyyMM=${invoiceMonth})}">PHD Timesheet</a>
+  <a th:href="@{/download-phd-timesheet(yyyyMM=${yyyyMM})}">PHD Timesheet</a>
   <br/><br/><br/>
-  <a th:href="@{/display-ena-invoice(yyyyMM=${invoiceMonth})}" target="_blank">ENA Invoice</a>
+  <a th:href="@{/display-ena-invoice(yyyyMM=${yyyyMM})}" target="_blank">ENA Invoice</a>
   <br/><br/><br/>
   <a th:href="@{/home}">Home</a>
 

@@ -5,9 +5,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public abstract class ControllerBase {
-    public static final DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-    public static final DateTimeFormatter yyyyMM = DateTimeFormatter.ofPattern("yyyyMM");
+    public static final DateTimeFormatter isoLocalDateFmt = DateTimeFormatter.ISO_LOCAL_DATE;
+    public static final DateTimeFormatter yyyyMMFmt = DateTimeFormatter.ofPattern("yyyyMM");
+    protected static final DateTimeFormatter mmyyFmt = DateTimeFormatter.ofPattern("MMMM yyyy");
 
     protected byte[] getBytes(InputStream inputStream) {
         byte[] bytes = null;
@@ -24,8 +24,13 @@ public abstract class ControllerBase {
      * @return date in format yyyyMM
      * */
     protected String getYearMonth(String dateStr) {
-        LocalDate tsMonth = LocalDate.parse(dateStr, yyyyMMdd);
-        return "" + Integer.parseInt(yyyyMM.format(tsMonth));
+        LocalDate tsMonth = LocalDate.parse(dateStr, isoLocalDateFmt);
+        return "" + Integer.parseInt(yyyyMMFmt.format(tsMonth));
+    }
+
+    protected String getMonthYear(String dateStr) {
+        LocalDate tsMonth = LocalDate.parse(dateStr, isoLocalDateFmt);
+        return mmyyFmt.format(tsMonth);
     }
 
 }

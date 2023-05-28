@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 public class EnaUploadFlow extends ControllerBase {
     protected void saveEnaUpdatePhd(String dateStr, InputStream inputStream, DynamoDbClient dynamoDBClient) throws IOException {
-        LocalDate tsMonth = LocalDate.parse(dateStr, yyyyMMdd);
+        LocalDate tsMonth = LocalDate.parse(dateStr, isoLocalDateFmt);
         byte[] fileBytes = getBytes(inputStream);
         EnaTimesheet enaTimesheet = new EnaTimesheet(tsMonth, fileBytes);
         saveEnaTimesheet(tsMonth, fileBytes, dynamoDBClient);
@@ -20,14 +20,14 @@ public class EnaUploadFlow extends ControllerBase {
     }
 
     protected void saveEnaTimesheet(LocalDate tsMonth, byte[] enaTimesheet, DynamoDbClient dynamoDBClient) {
-        String invoiceMonth = yyyyMM.format(tsMonth);
+        String invoiceMonth = yyyyMMFmt.format(tsMonth);
         EnaTimesheetDao enaTimesheetDao = new EnaTimesheetDao(dynamoDBClient);
         enaTimesheetDao.putItem(invoiceMonth, enaTimesheet);
     }
 
     protected void updatePhdTemplate(LocalDate tsMonth, EnaTimesheet enaTimesheet, DynamoDbClient dynamoDBClient) throws IOException {
         PhdTemplateDao phdTemplateDao = new PhdTemplateDao(dynamoDBClient);
-        String invoiceMonth = yyyyMM.format(tsMonth);
+        String invoiceMonth = yyyyMMFmt.format(tsMonth);
         byte[] phdBytes = phdTemplateDao.getItem(invoiceMonth);
         if (phdBytes != null) {
             PhdTemplate phdTemplate = new PhdTemplate(invoiceMonth, phdBytes);
