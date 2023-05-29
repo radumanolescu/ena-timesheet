@@ -140,6 +140,7 @@ public class PhdTemplate {
             int numEntries = entries.size();
             for (Row row : sheet) {
                 if (rowId >= numEntries) break;
+                eraseEffort(rowId, row);
                 PhdTemplateEntry entry = entries.get(rowId);
                 for (Map.Entry<Integer, Double> dayEffort : entry.getEffort().entrySet()) {
                     int day = dayEffort.getKey();
@@ -154,6 +155,16 @@ public class PhdTemplate {
             outputStream.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void eraseEffort(int rowId, Row row) {
+        // Skip the first row (header)
+        if (rowId > 0) {
+            // Erase the row to make sure we don't have any old data
+            for (int colId = colOffset + 1; colId <= colOffset + 31; colId++) {
+                row.getCell(colId).setCellValue("");
+            }
         }
     }
 
