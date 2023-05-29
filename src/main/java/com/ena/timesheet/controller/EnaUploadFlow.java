@@ -11,6 +11,12 @@ import java.io.InputStream;
 import java.time.LocalDate;
 
 public class EnaUploadFlow extends ControllerBase {
+
+    /**
+     * @param dateStr        - Date string in format yyyy-MM-dd
+     * @param inputStream    - InputStream of an ENA Timesheet xlsx file to be uploaded
+     * @param dynamoDBClient - DynamoDB client
+     */
     protected void saveEnaUpdatePhd(String dateStr, InputStream inputStream, DynamoDbClient dynamoDBClient) throws IOException {
         LocalDate tsMonth = LocalDate.parse(dateStr, isoLocalDateFmt);
         byte[] fileBytes = getBytes(inputStream);

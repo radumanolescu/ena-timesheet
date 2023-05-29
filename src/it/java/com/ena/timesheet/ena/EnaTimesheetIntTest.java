@@ -1,5 +1,6 @@
 package com.ena.timesheet.ena;
 
+import com.ena.timesheet.IntTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class EnaTimesheetIntTest {
+public class EnaTimesheetIntTest extends IntTest {
     public static final String filePath = "PHD 03 - Mar 2023.xlsx";
     public static final LocalDate march2023 = LocalDate.of(2023, 3, 15);
 
@@ -49,10 +50,5 @@ public class EnaTimesheetIntTest {
         }
     }
 
-    private URI findFile(String fileName) throws URISyntaxException {
-        ClassLoader classLoader = getClass().getClassLoader();
-        URL resource = classLoader.getResource(fileName);
-        return resource.toURI();
-    }
 }
 

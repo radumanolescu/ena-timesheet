@@ -65,4 +65,13 @@ public class EnaTimesheetDao {
             System.err.println(e.getMessage());
         }
     }
+
+    public void deleteItem(String keyVal) {
+        DeleteItemRequest deleteItemRequest = DeleteItemRequest.builder()
+                .tableName(tableName)
+                .key(Map.of(key, AttributeValue.builder().s(keyVal).build()))
+                .build();
+
+        ddb.deleteItem(deleteItemRequest);
+    }
 }

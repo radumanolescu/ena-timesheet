@@ -129,7 +129,7 @@ public class PhdTemplate {
     }
 
     // In the spreadsheet, the column for day 1 of the month is column 3 in Excel ie row.getCell(2)
-    private static final int colOffset = 1;
+    public static final int colOffset = 1;
 
     public void updateXlsx(int index) {
         if (xlsxBytes == null) return;

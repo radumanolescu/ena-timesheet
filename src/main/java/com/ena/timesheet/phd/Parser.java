@@ -11,7 +11,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.ena.timesheet.util.Text.replaceNonAscii;
 import static com.ena.timesheet.xl.XlUtil.stringValue;
@@ -35,15 +37,29 @@ public class Parser extends ExcelParser {
         Workbook workbook = WorkbookFactory.create(inputStream);
         int index = 0; // first sheet
         Sheet sheet = workbook.getSheetAt(index);
-        int i = 0;
+        int rowNum = 0;
         for (Row row : sheet) {
             String client = stringValue(row.getCell(0)).trim();
             if (client.equals("SUM")) {
                 break;
             }
             String task = stringValue(row.getCell(1)).trim();
-            entries.add(new PhdTemplateEntry(i, replaceNonAscii(client), replaceNonAscii(task)));
-            i++;
+            // Read the effort per day from the row
+            Map<Integer, Double> effort = new HashMap<>();
+            // Skip the first row (header)
+            if (rowNum > 0) {
+                // Each day is a column in the sheet, starting from column 2 (offset 1) and ending at column 32 (offset 31)
+                for (int colId = PhdTemplate.colOffset + 1; colId <= PhdTemplate.colOffset + 31; colId++) {
+                    Double d = row.getCell(colId).getNumericCellValue();
+                    if (d != null) {
+                        effort.put(colId - PhdTemplate.colOffset, d);
+                    }
+                }
+            }
+            PhdTemplateEntry entry = new PhdTemplateEntry(rowNum, replaceNonAscii(client), replaceNonAscii(task));
+            entry.setEffort(effort);
+            entries.add(entry);
+            rowNum++;
         }
         setProjectCodes(entries);
         return entries;
