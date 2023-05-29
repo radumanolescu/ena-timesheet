@@ -5,14 +5,38 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.time.LocalDate;
 import java.util.*;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.summingDouble;
 
 public class EnaTimesheet {
     public EnaTimesheet(LocalDate timesheetMonth, InputStream inputStream) {
         this.timesheetMonth = timesheetMonth;
+        parseSortReindex(inputStream);
+    }
+
+    public EnaTimesheet(LocalDate timesheetMonth, File enaTimesheetFile) throws IOException {
+        this.timesheetMonth = timesheetMonth;
+        try (InputStream inputStream = new FileInputStream(enaTimesheetFile)) {
+            parseSortReindex(inputStream);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public EnaTimesheet(LocalDate timesheetMonth, byte[] fileBytes) throws IOException {
+        this.timesheetMonth = timesheetMonth;
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(fileBytes)) {
+            parseSortReindex(bis);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    private void parseSortReindex(InputStream inputStream){
         int sheetIndex = 0; // Assume it's the first sheet
         List<EnaTsEntry> inputEntries = parseEntries(inputStream, sheetIndex);
         sortByDayProjectId(inputEntries);
@@ -26,8 +50,7 @@ public class EnaTimesheet {
      * plus empty lines for invoice formatting.
      */
     public List<EnaTsEntry> getEntriesWithTotals() {
-        List<EnaTsEntry> entriesWithTotals = new ArrayList<>();
-        entriesWithTotals.addAll(enaTsEntries);
+        List<EnaTsEntry> entriesWithTotals = new ArrayList<>(enaTsEntries);
         List<EnaTsEntry> totalEntries = weeklyTotals(enaTsEntries);
         entriesWithTotals.addAll(totalEntries);
         sortByEntryId(entriesWithTotals);
@@ -77,11 +100,11 @@ public class EnaTimesheet {
     }
 
     private void sortByDayProjectId(List<EnaTsEntry> entries) {
-        Collections.sort(entries, Comparator.comparing(EnaTsEntry::sortKey));
+        entries.sort(Comparator.comparing(EnaTsEntry::sortKey));
     }
 
     private void sortByEntryId(List<EnaTsEntry> entries) {
-        Collections.sort(entries, Comparator.comparing(o -> o.entryId));
+        entries.sort(Comparator.comparing(o -> o.entryId));
     }
 
     private List<EnaTsEntry> weeklyTotals(List<EnaTsEntry> entries) {
@@ -138,7 +161,7 @@ public class EnaTimesheet {
         float totalHours = 0.0f;
         Map<String, EnaTsProjectEntry> projectEntryMap = new HashMap<>();
         for (EnaTsEntry entry : entries) {
-            String projectActivity = entry.getProjectId() + "#" + entry.getActivity();
+            String projectActivity = entry.projectActivity();
             EnaTsProjectEntry projectEntry = projectEntryMap.getOrDefault(projectActivity, new EnaTsProjectEntry(entry.getProjectId(), entry.getActivity(), 0.0f));
             projectEntry.setHours(projectEntry.hours + entry.hours);
             totalHours += entry.hours;
@@ -150,5 +173,21 @@ public class EnaTimesheet {
         Collections.sort(projectEntries);
         projectEntries.add(new EnaTsProjectEntry("Total hours:", "", totalHours));
         return projectEntries;
+    }
+
+    public double totalHours() {
+        return enaTsEntries.stream().mapToDouble(EnaTsEntry::getHours).sum();
+    }
+
+    public Map<String, Map<Integer, Double>> totalHoursByClientTaskDay() {
+        return enaTsEntries.stream().collect(
+                groupingBy(
+                        EnaTsEntry::projectActivity,
+                        groupingBy(
+                                EnaTsEntry::getDay,
+                                summingDouble(EnaTsEntry -> EnaTsEntry.hours)
+                        )
+                )
+        );
     }
 }

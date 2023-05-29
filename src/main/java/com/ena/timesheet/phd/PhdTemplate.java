@@ -1,9 +1,20 @@
 package com.ena.timesheet.phd;
 
-import java.io.IOException;
-import java.io.InputStream;
+import com.ena.timesheet.ena.EnaTimesheet;
+import com.ena.timesheet.ena.EnaTsEntry;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+
+import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class PhdTemplate {
     public PhdTemplate(String yearMonth, List<PhdTemplateEntry> entries) {
@@ -13,14 +24,27 @@ public class PhdTemplate {
 
     public PhdTemplate(String yearMonth, InputStream inputStream) throws IOException {
         this.yearMonth = yearMonth;
+        this.xlsxBytes = getBytes(inputStream);
         Parser parser = new Parser();
-        this.entries = parser.parseEntries(inputStream);
+        this.entries = parser.parseBytes(xlsxBytes);
     }
 
     public PhdTemplate(String yearMonth, byte[] bytes) throws IOException {
         this.yearMonth = yearMonth;
         Parser parser = new Parser();
         this.entries = parser.parseBytes(bytes);
+        this.xlsxBytes = bytes;
+    }
+
+    public PhdTemplate(String yearMonth, File phdTemplateFile) throws IOException {
+        this.yearMonth = yearMonth;
+        try (InputStream inputStream = new FileInputStream(phdTemplateFile)) {
+            Parser parser = new Parser();
+            this.entries = parser.parseEntries(inputStream);
+            this.xlsxBytes = Files.readAllBytes(phdTemplateFile.toPath());
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     public List<PhdTemplateEntry> getEntries() {
@@ -29,13 +53,22 @@ public class PhdTemplate {
 
     public byte[] dropdowns() {
         StringBuilder sb = new StringBuilder();
-        for (PhdTemplateEntry entry : entries) {
-            if (!entry.getTask().equals("TASK")) {
-                sb.append(entry.clientHashTask() + "\r\n");
-            }
+        for (String clientTask : clientTasks()) {
+            sb.append(clientTask + "\r\n");
         }
         byte[] bytes = sb.toString().getBytes(Charset.forName("UTF-8"));
         return bytes;
+    }
+
+    public List<String> clientTasks() {
+        return entries.stream()
+                .filter(entry -> !entry.getTask().equals("TASK"))
+                .map(PhdTemplateEntry::clientHashTask)
+                .collect(Collectors.toList());
+    }
+
+    public Set<String> clientTaskSet() {
+        return new HashSet<>(clientTasks());
     }
 
     public void setEntries(List<PhdTemplateEntry> entries) {
@@ -53,4 +86,97 @@ public class PhdTemplate {
     public void setYearMonth(String yearMonth) {
         this.yearMonth = yearMonth;
     }
+
+    public double totalHours() {
+        return entries.stream().mapToDouble(PhdTemplateEntry::totalHours).sum();
+    }
+
+    private byte[] xlsxBytes;
+
+    public byte[] getXlsxBytes() {
+        return xlsxBytes;
+    }
+
+    public void setXlsxBytes(byte[] xlsxBytes) {
+        this.xlsxBytes = xlsxBytes;
+    }
+
+    public void update(EnaTimesheet enaTimesheet) {
+        checkTasks(enaTimesheet);
+        Map<String, Map<Integer, Double>> enaEffort = enaTimesheet.totalHoursByClientTaskDay();
+        for (PhdTemplateEntry phdEntry : entries) {
+            Map<Integer, Double> enaEntry = enaEffort.get(phdEntry.clientHashTask());
+            if (enaEntry != null) {
+                phdEntry.setEffort(enaEntry);
+            }
+        }
+        double enaTotalHours = enaTimesheet.totalHours();
+        double phdTotalHours = totalHours();
+        if (enaTotalHours != phdTotalHours) {
+            throw new RuntimeException("Total hours mismatch: ENA=" + enaTotalHours + " PHD=" + phdTotalHours);
+        }
+        updateXlsx(0);
+    }
+
+    public void checkTasks(EnaTimesheet enaTimesheet) {
+        Set<String> clientTaskSet = clientTaskSet();
+        for (EnaTsEntry enaEntry : enaTimesheet.getEntries()) {
+            String matchKey = enaEntry.projectActivity();
+            if (!clientTaskSet.contains(matchKey)) {
+                throw new RuntimeException("Unknown ENA task: " + matchKey);
+            }
+        }
+    }
+
+    // In the spreadsheet, the column for day 1 of the month is column 3 in Excel ie row.getCell(2)
+    public static final int colOffset = 1;
+
+    public void updateXlsx(int index) {
+        if (xlsxBytes == null) return;
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(xlsxBytes)) {
+            Workbook workbook = WorkbookFactory.create(inputStream);
+            Sheet sheet = workbook.getSheetAt(index);
+            int rowId = 0;
+            int numEntries = entries.size();
+            for (Row row : sheet) {
+                if (rowId >= numEntries) break;
+                eraseEffort(rowId, row);
+                PhdTemplateEntry entry = entries.get(rowId);
+                for (Map.Entry<Integer, Double> dayEffort : entry.getEffort().entrySet()) {
+                    int day = dayEffort.getKey();
+                    double effort = dayEffort.getValue();
+                    row.getCell(colOffset + day).setCellValue(effort);
+                }
+                rowId++;
+            }
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            xlsxBytes = outputStream.toByteArray();
+            outputStream.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void eraseEffort(int rowId, Row row) {
+        // Skip the first row (header)
+        if (rowId > 0) {
+            // Erase the row to make sure we don't have any old data
+            for (int colId = colOffset + 1; colId <= colOffset + 31; colId++) {
+                row.getCell(colId).setCellValue("");
+            }
+        }
+    }
+
+    public byte[] getBytes(InputStream inputStream) {
+        byte[] bytes = null;
+        try {
+            bytes = new byte[inputStream.available()];
+            inputStream.read(bytes);
+        } catch (Exception e) {
+            System.out.println("Error converting InputStream to byte[]");
+        }
+        return bytes;
+    }
+
 }

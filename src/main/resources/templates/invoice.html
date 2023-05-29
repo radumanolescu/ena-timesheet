@@ -1886,7 +1886,7 @@ pre code {
             <td th:text="${entry.projectId}" style="text-align:left;"></td>
             <td th:text="${entry.activity}" style="text-align:left;"></td>
             <td th:text="${entry.date}" style="text-align:left;"></td>
-            <td th:text="${entry.hours}" style="text-align:left;"></td>
+            <td th:text="${entry.formattedHours()}" style="text-align:left;"></td>
             <td th:text="${entry.rate}" style="text-align:left;"></td>
             <td th:text="${entry.description}" th:classappend="${entry.projectId == ''} ? 'bold' : ''" style="text-align:left;"></td>
             <td th:text="${entry.charge}"      th:classappend="${entry.projectId == ''} ? 'bold' : ''" style="text-align:left;"></td>

@@ -8,14 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class PhdTemplateDao {
-    public static final String tableName = "PhdTemplate";
+public class EnaTimesheetDao {
+    public static final String tableName = "EnaTimesheet";
     public static final String key = "yyyyMM";
     public static final String fileBytesAttr = "fileBytes";
 
     private final DynamoDbClient ddb;
 
-    public PhdTemplateDao(DynamoDbClient ddb) {
+    public EnaTimesheetDao(DynamoDbClient ddb) {
         this.ddb = ddb;
     }
 
@@ -74,5 +74,4 @@ public class PhdTemplateDao {
 
         ddb.deleteItem(deleteItemRequest);
     }
-
 }

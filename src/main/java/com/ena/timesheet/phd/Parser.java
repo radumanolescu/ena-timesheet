@@ -1,15 +1,22 @@
 package com.ena.timesheet.phd;
 
-import com.ena.timesheet.util.Text;
 import com.ena.timesheet.xl.ExcelParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.ena.timesheet.util.Text.replaceNonAscii;
+import static com.ena.timesheet.xl.XlUtil.stringValue;
 
 public class Parser extends ExcelParser {
 
@@ -27,93 +34,107 @@ public class Parser extends ExcelParser {
 
     public List<PhdTemplateEntry> parseEntries(InputStream inputStream) throws IOException {
         List<PhdTemplateEntry> entries = new ArrayList<>();
-        List<String> lines = new ArrayList<>();
-        Map<Integer, List<String>> rows = readWorkbook(inputStream, 0);
-        boolean stop = false;
-        for (List<String> row : rows.values()) {
-            if (row.get(0).equals("SUM")) {
-                stop = true;
+        Workbook workbook = WorkbookFactory.create(inputStream);
+        int index = 0; // first sheet
+        Sheet sheet = workbook.getSheetAt(index);
+        int rowNum = 0;
+        for (Row row : sheet) {
+            String client = stringValue(row.getCell(0)).trim();
+            if (client.equals("SUM")) {
+                break;
             }
-            if (row.size() > 1 && !stop) {
-                String rawLine = row.get(0) + "\t" + row.get(1);
-                String line = Text.replaceNonAscii(rawLine);
-                lines.add(line);
+            String task = stringValue(row.getCell(1)).trim();
+            // Read the effort per day from the row
+            Map<Integer, Double> effort = new HashMap<>();
+            // Skip the first row (header)
+            if (rowNum > 0) {
+                // Each day is a column in the sheet, starting from column 2 (offset 1) and ending at column 32 (offset 31)
+                for (int colId = PhdTemplate.colOffset + 1; colId <= PhdTemplate.colOffset + 31; colId++) {
+                    Double d = row.getCell(colId).getNumericCellValue();
+                    if (d != null) {
+                        effort.put(colId - PhdTemplate.colOffset, d);
+                    }
+                }
             }
+            PhdTemplateEntry entry = new PhdTemplateEntry(rowNum, replaceNonAscii(client), replaceNonAscii(task));
+            entry.setEffort(effort);
+            entries.add(entry);
+            rowNum++;
         }
-        return setProjectCodes(lines);
+        setProjectCodes(entries);
+        return entries;
     }
 
-    public List<PhdTemplateEntry> setProjectCodes(List<String> lines) {
-        List<String[]> worksheet = new ArrayList<>();
+    public void setProjectCodes(List<PhdTemplateEntry> entries) throws JsonProcessingException {
         String projectCde = "";
         int projectBgn = -1;
         int projectEnd = -1;
 
-        int numLin = lines.size();
-        while (lines.get(numLin - 1).length() < 2) {
-            numLin--; // remove last lines if they are empty
+        int numLin = entries.size();
+        while (entries.get(numLin - 1).isBlank()) {
+            entries.remove(numLin - 1); // remove last entries if they are empty
+            numLin--;
         }
+        // Starting from the last line, find the project code and boundaries ([start,end] line IDs).
+        // Once found, set the project code for all the entries in the project.
         for (int lineNum = numLin - 1; lineNum >= 0; lineNum--) {
-            worksheet.add(new String[2]);
-        }
-        for (int lineNum = numLin - 1; lineNum >= 0; lineNum--) {
-            worksheet.get(lineNum)[0] = "";
-            worksheet.get(lineNum)[1] = "";
-            String[] words = lines.get(lineNum).trim().split("\t");
-            int numWords = words.length;
-
-            switch (numWords) {
-                case 1:
-                    worksheet.get(lineNum)[1] = words[0].trim();
-                    if (words[0].trim().isEmpty()) {
+            p(entries.get(lineNum), projectCde, projectBgn, projectEnd);
+            String entryType = entries.get(lineNum).entryType();
+            switch (entryType) {
+                case "null_null": // empty line between groups
+                    // The first empty line after a project group indicates that the project begins at the next line.
+                    if (projectBgn < 0) {
                         projectBgn = lineNum + 1;
-                        p(words, projectCde, projectBgn, projectEnd);
-                        s(projectCde, projectBgn, projectEnd, worksheet);
-                        projectBgn = -1;
-                        projectEnd = -1;
-                        projectCde = "";
-                    } else {
-                        if (projectEnd < 0) {
-                            projectEnd = lineNum;
-                        }
+                    }
+                    // So set the project code for all the entries in the project
+                    s(projectCde, projectBgn, projectEnd, entries);
+                    p(entries.get(lineNum), projectCde, projectBgn, projectEnd);
+                    // Reset the project code and boundaries
+                    projectBgn = -1;
+                    projectEnd = -1;
+                    projectCde = "";
+                    break;
+                case "null_Task": // activity line
+                    // If we have encountered an activity but the project is undefined,
+                    // it means we have encountered a new project.
+                    if (projectEnd < 0) {
+                        projectEnd = lineNum;
                     }
                     break;
-                default:
-                    worksheet.get(lineNum)[1] = words[1].trim();
+                case "Client_Task":
+                    // The project code is the first word of the line,
+                    // in the last entry of the group that has a non-empty value in that field.
                     if (projectCde.isEmpty()) {
-                        projectCde = words[0];
+                        projectCde = entries.get(lineNum).getClient();
                     }
                     if (projectEnd < 0) {
                         projectEnd = lineNum;
                     }
                     break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + entryType);
             }
-
-            p(words, projectCde, projectBgn, projectEnd);
             if (lineNum == 0) {
                 projectBgn = 1;
-                p(words, projectCde, projectBgn, projectEnd);
-                s(projectCde, projectBgn, projectEnd, worksheet);
+                s(projectCde, projectBgn, projectEnd, entries);
             }
+            p(entries.get(lineNum), projectCde, projectBgn, projectEnd);
         }
-
-        List<PhdTemplateEntry> entries = new ArrayList<>();
-        for (String[] row : worksheet) {
-            entries.add(new PhdTemplateEntry(row[0], row[1]));
-        }
-
-        return entries;
     }
 
-    private void p(String[] w, String pC, int pB, int pE) {
-        String ws = Arrays.toString(w).replace(", ", "|||").replace("[", "[").replace("]", "]");
-        String ps = w.length + "," + pC + ":(" + pB + "," + pE + ")";
-        // System.out.println(ws + ps);
+    private void p(PhdTemplateEntry w, String pC, int pB, int pE) throws JsonProcessingException {
+        String ws = w.toJson();
+        int xl = w.getRowNum() + 1;
+        String ps = "{xl=" + xl + ",t=" + w.entryType() + ",c=`" + pC + "`,b=" + pB + ",e=" + pE + "}";
+//        System.out.println(ws + "\t\t" + ps);
     }
 
-    private void s(String pC, int pB, int pE, List<String[]> worksheet) {
+    private void s(String pC, int pB, int pE, List<PhdTemplateEntry> worksheet) {
+        if (pC.isEmpty() || pB < 0 || pE < 0) {
+            return;
+        }
         for (int lineNum = pB; lineNum <= pE; lineNum++) {
-            worksheet.get(lineNum)[0] = pC;
+            worksheet.get(lineNum).setClient(pC);
         }
     }
 
