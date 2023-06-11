@@ -32,7 +32,7 @@ public class TimesheetUpdaterIntTest {
         double enaTotalHours = enaTimesheet.totalHours();
         double phdTotalHours = phdTemplate.totalHours();
         assertEquals(enaTotalHours, phdTotalHours);
-        File tempFile = new File("/tmp/PhdTimesheet-WithEffort.xlsx");;
+        File tempFile = new File("/tmp/PhdTimesheet-WithEffort.xlsx");
         Files.write(tempFile.toPath(), phdTemplate.getXlsxBytes());
     }
 

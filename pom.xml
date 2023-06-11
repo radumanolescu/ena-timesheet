@@ -208,6 +208,14 @@
     </dependencies>
 
     <build>
+        <testResources>
+            <testResource>
+                <directory>src/it/resources</directory>
+            </testResource>
+            <!--<testSources>
+                <directory>src/it/java</directory>
+            </testSources>-->
+        </testResources>
         <pluginManagement>
             <plugins>
                 <plugin>
