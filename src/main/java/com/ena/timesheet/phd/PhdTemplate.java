@@ -137,7 +137,7 @@ public class PhdTemplate {
             int numEntries = entries.size();
             for (Row row : sheet) {
                 if (rowId >= numEntries) break;
-//                eraseEffort(rowId, row);
+                eraseEffort(rowId, row);
                 PhdTemplateEntry entry = entries.get(rowId);
                 for (Map.Entry<Integer, Double> dayEffort : entry.getEffort().entrySet()) {
                     int day = dayEffort.getKey();
@@ -147,7 +147,6 @@ public class PhdTemplate {
                         cell = row.createCell(colOffset + day);
                     }
                     cell.setCellValue(effort);
-                    System.out.println("UpdateCell: " + rowId + " " + day + " " + effort + " " + cell);
                 }
                 rowId++;
             }
@@ -163,7 +162,6 @@ public class PhdTemplate {
     }
 
     // Erase the effort for the row
-    // This creates an undesirable effect of the cell set to 0 instead of blank
     private void eraseEffort(int rowId, Row row) {
         // Skip the first row (header)
         if (rowId > 0) {
@@ -171,13 +169,8 @@ public class PhdTemplate {
             for (int colId = colOffset + 1; colId <= colOffset + 31; colId++) {
                 Cell cell = row.getCell(colId);
                 if (cell != null) {
-                    row.removeCell(cell);
-//                  cell.setBlank();
-//                  cell.setCellValue(""); // Wrong: sets the cell to String type
+                    cell.setBlank();
                 }
-//                row.getCell(colId).setBlank();
-//                row.getCell(colId).setCellValue("");
-//                row.getCell(colId).setCellType(CellType.BLANK); // deprecated
             }
         }
     }
