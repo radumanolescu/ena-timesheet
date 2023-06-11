@@ -2,10 +2,7 @@ package com.ena.timesheet.phd;
 
 import com.ena.timesheet.xl.ExcelParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -50,9 +47,12 @@ public class Parser extends ExcelParser {
             if (rowNum > 0) {
                 // Each day is a column in the sheet, starting from column 2 (offset 1) and ending at column 32 (offset 31)
                 for (int colId = PhdTemplate.colOffset + 1; colId <= PhdTemplate.colOffset + 31; colId++) {
-                    Double d = row.getCell(colId).getNumericCellValue();
-                    if (d != null) {
-                        effort.put(colId - PhdTemplate.colOffset, d);
+                    Cell cell = row.getCell(colId);
+                    if (cell != null && cell.getCellType() == CellType.NUMERIC) {
+                        Double d = cell.getNumericCellValue();
+                        if (d != null) {
+                            effort.put(colId - PhdTemplate.colOffset, d);
+                        }
                     }
                 }
             }

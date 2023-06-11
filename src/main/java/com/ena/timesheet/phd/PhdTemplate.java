@@ -2,10 +2,7 @@ package com.ena.timesheet.phd;
 
 import com.ena.timesheet.ena.EnaTimesheet;
 import com.ena.timesheet.ena.EnaTsEntry;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -140,15 +137,22 @@ public class PhdTemplate {
             int numEntries = entries.size();
             for (Row row : sheet) {
                 if (rowId >= numEntries) break;
-                eraseEffort(rowId, row);
+//                eraseEffort(rowId, row);
                 PhdTemplateEntry entry = entries.get(rowId);
                 for (Map.Entry<Integer, Double> dayEffort : entry.getEffort().entrySet()) {
                     int day = dayEffort.getKey();
                     double effort = dayEffort.getValue();
-                    row.getCell(colOffset + day).setCellValue(effort);
+                    Cell cell = row.getCell(colOffset + day);
+                    if (cell == null) {
+                        cell = row.createCell(colOffset + day);
+                    }
+                    cell.setCellValue(effort);
+                    System.out.println("UpdateCell: " + rowId + " " + day + " " + effort + " " + cell);
                 }
                 rowId++;
             }
+            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+            evaluator.evaluateAll();
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             workbook.write(outputStream);
             xlsxBytes = outputStream.toByteArray();
@@ -158,12 +162,22 @@ public class PhdTemplate {
         }
     }
 
+    // Erase the effort for the row
+    // This creates an undesirable effect of the cell set to 0 instead of blank
     private void eraseEffort(int rowId, Row row) {
         // Skip the first row (header)
         if (rowId > 0) {
             // Erase the row to make sure we don't have any old data
             for (int colId = colOffset + 1; colId <= colOffset + 31; colId++) {
-                row.getCell(colId).setCellValue("");
+                Cell cell = row.getCell(colId);
+                if (cell != null) {
+                    row.removeCell(cell);
+//                  cell.setBlank();
+//                  cell.setCellValue(""); // Wrong: sets the cell to String type
+                }
+//                row.getCell(colId).setBlank();
+//                row.getCell(colId).setCellValue("");
+//                row.getCell(colId).setCellType(CellType.BLANK); // deprecated
             }
         }
     }
