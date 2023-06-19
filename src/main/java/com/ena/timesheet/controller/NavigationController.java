@@ -10,6 +10,11 @@ public class NavigationController {
         return "index";
     }
 
+    @GetMapping("/validate")
+    public String validateENA() {
+        return "validate";
+    }
+
     @GetMapping("/download-all")
     public String download() {
         return "download";

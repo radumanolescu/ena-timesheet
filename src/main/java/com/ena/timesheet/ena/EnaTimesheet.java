@@ -1,44 +1,46 @@
 package com.ena.timesheet.ena;
 
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.commons.text.similarity.JaroWinklerDistance;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.ena.timesheet.util.IOUtil.getBytes;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.summingDouble;
 
 public class EnaTimesheet {
-    public EnaTimesheet(LocalDate timesheetMonth, InputStream inputStream) {
+    private static final int SHEET_INDEX = 0; // Assume it's the first sheet
+
+    public EnaTimesheet(LocalDate timesheetMonth, InputStream inputStream) throws IOException {
         this.timesheetMonth = timesheetMonth;
+        this.xlsxBytes = getBytes(inputStream);
         parseSortReindex(inputStream);
     }
 
     public EnaTimesheet(LocalDate timesheetMonth, File enaTimesheetFile) throws IOException {
         this.timesheetMonth = timesheetMonth;
         try (InputStream inputStream = new FileInputStream(enaTimesheetFile)) {
-            parseSortReindex(inputStream);
-        } catch (Exception e) {
-            throw e;
+            this.xlsxBytes = getBytes(inputStream);
+            try (ByteArrayInputStream bis = new ByteArrayInputStream(xlsxBytes)) {
+                parseSortReindex(bis);
+            }
         }
     }
 
     public EnaTimesheet(LocalDate timesheetMonth, byte[] fileBytes) throws IOException {
         this.timesheetMonth = timesheetMonth;
+        this.xlsxBytes = fileBytes;
         try (ByteArrayInputStream bis = new ByteArrayInputStream(fileBytes)) {
             parseSortReindex(bis);
-        } catch (Exception e) {
-            throw e;
         }
     }
 
-    private void parseSortReindex(InputStream inputStream){
-        int sheetIndex = 0; // Assume it's the first sheet
-        List<EnaTsEntry> inputEntries = parseEntries(inputStream, sheetIndex);
+    private void parseSortReindex(InputStream inputStream) throws IOException {
+        List<EnaTsEntry> inputEntries = parseEntries(inputStream);
         sortByDayProjectId(inputEntries);
         reindexEntries(inputEntries);
         this.enaTsEntries.addAll(inputEntries);
@@ -74,22 +76,65 @@ public class EnaTimesheet {
 
     private final List<EnaTsProjectEntry> projectEntries = new ArrayList<>();
 
-    private List<EnaTsEntry> parseEntries(InputStream inputStream, int sheetIndex) {
+    private byte[] xlsxBytes;
+
+    public byte[] getXlsxBytes() {
+        return xlsxBytes;
+    }
+
+    public void setXlsxBytes(byte[] xlsxBytes) {
+        this.xlsxBytes = xlsxBytes;
+    }
+
+    private List<EnaTsEntry> parseEntries(InputStream inputStream) throws IOException {
         List<EnaTsEntry> enaEntries = new ArrayList<>();
-        try {
-            Workbook workbook = WorkbookFactory.create(inputStream);
-            Sheet sheet = workbook.getSheetAt(sheetIndex);
-            int lineId = 0;
-            for (Row row : sheet) {
-                EnaTsEntry entry = new EnaTsEntry(lineId++, timesheetMonth, row);
-                if (entry.getValidCells() > 5) {
-                    enaEntries.add(entry);
-                }
+        Workbook workbook = WorkbookFactory.create(inputStream);
+        Sheet sheet = workbook.getSheetAt(SHEET_INDEX);
+        int lineId = 0;
+        boolean validationErrors = false;
+        for (Row row : sheet) {
+            EnaTsEntry entry = new EnaTsEntry(lineId++, timesheetMonth, row);
+            if (entry.getValidCells() > 5) {
+                enaEntries.add(entry);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            if (!entry.getError().isEmpty()) {
+                validationErrors = true;
+            }
+        }
+        if (validationErrors) {
+            updateBytes(workbook);
         }
         return enaEntries;
+    }
+
+    private void updateBytes(Workbook workbook) throws IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        workbook.write(bos);
+        bos.close();
+        xlsxBytes = bos.toByteArray();
+    }
+
+    private static final int ERROR_COLUMN = 6;
+
+    private void updateBytes() throws IOException {
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(xlsxBytes)) {
+            Workbook workbook = WorkbookFactory.create(bis);
+            Sheet sheet = workbook.getSheetAt(SHEET_INDEX);
+            for (EnaTsEntry entry : enaTsEntries) {
+                if (!entry.getError().isEmpty()) {
+                    Row row = sheet.getRow(entry.lineId);
+                    Cell cell = row.getCell(ERROR_COLUMN);
+                    if (cell == null) {
+                        cell = row.createCell(ERROR_COLUMN);
+                    }
+                    cell.setCellValue(entry.getError());
+                }
+            }
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            workbook.write(bos);
+            bos.close();
+            xlsxBytes = bos.toByteArray();
+        }
     }
 
     private void reindexEntries(List<EnaTsEntry> entries) {
@@ -150,6 +195,10 @@ public class EnaTimesheet {
         return summaryByWeek;
     }
 
+    public LocalDate getTimesheetMonth() {
+        return timesheetMonth;
+    }
+
     static class WeeklySummary {
         Float totalHours = 0.0f;
         Float maxEntryId = 0.0f;
@@ -190,4 +239,58 @@ public class EnaTimesheet {
                 )
         );
     }
+
+    public boolean isValidAllClientTasks(Set<String> clientTaskSet) throws IOException {
+        boolean valid = true;
+        for (EnaTsEntry entry : enaTsEntries) {
+            if (!clientTaskSet.contains(entry.projectActivity())) {
+                valid = false;
+                String err0 = entry.getError();
+                String suggested = bestMatch(entry.projectActivity(), clientTaskSet);
+                String err1 = "Invalid project#activity. Did you mean '" + suggested + "'?";
+                entry.setError(err0 + err1);
+            }
+        }
+        if (!valid) {
+            updateBytes();
+        }
+        return valid;
+    }
+
+    public boolean isValid() {
+        boolean valid = true;
+        for (EnaTsEntry entry : enaTsEntries) {
+            if (!entry.getError().isEmpty()) {
+                valid = false;
+            }
+        }
+        return valid;
+    }
+
+    public int numValidationErrors() {
+        int num = 0;
+        for (EnaTsEntry entry : enaTsEntries) {
+            if (!entry.getError().isEmpty()) {
+                num++;
+            }
+        }
+        return num;
+    }
+
+    public static String bestMatch(String projectActivity, Set<String> clientTaskSet) {
+        JaroWinklerDistance jaroWinklerDistance = new JaroWinklerDistance();
+        Map<String, Double> map = new HashMap<>();
+        for (String clientTask : clientTaskSet) {
+            double score = jaroWinklerDistance.apply(projectActivity, clientTask);
+            map.put(clientTask, score);
+        }
+        List<Map.Entry<String, Double>> list = new ArrayList<>(map.entrySet());
+        list.sort(Map.Entry.comparingByValue());
+        return list.get(0).getKey();
+    }
+
+    public void writeFile(File output) throws IOException {
+        Files.write(output.toPath(), xlsxBytes);
+    }
+
 }

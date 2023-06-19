@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ENA Timesheet Validation</title>
+    <link rel="stylesheet" th:href="@{/ena/css/ena.css}"/>
+</head>
+
+<body>
+<div class="container-fluid main-container">
+    <h2><p th:text="${view.getTitle()}">This text will be replaced by the th:text parameter.</p></h2>
+    <h3><p th:text="${view.getPhdTemplateStatus()}">This text will be replaced by the th:text parameter.</p></h3>
+    <h3><p th:text="${view.getEnaTimesheetStatus()}">This text will be replaced by the th:text parameter.</p></h3>
+    <br/>
+    <div th:unless="${view.isValid()}">
+        <table>
+            <tr>
+                <th>project_id#activity</th>
+                <th>day</th>
+                <th>start</th>
+                <th>end</th>
+                <th>hours</th>
+                <th>description</th>
+                <th>validation errors</th>
+            </tr>
+            <tr th:each="entry : ${view.invalidEntries()}">
+                <td th:text="${entry.projectId + '#' + entry.activity}" style="text-align:left;"></td>
+                <td th:text="${entry.day}" style="text-align:left;"></td>
+                <td th:text="${entry.start}" style="text-align:left;"></td>
+                <td th:text="${entry.end}" style="text-align:left;"></td>
+                <td th:text="${entry.hours}" style="text-align:right;"></td>
+                <td th:text="${entry.description}" style="text-align:left;"></td>
+                <td th:text="${entry.error}" style="text-align:left;"></td>
+            </tr>
+        </table>
+    </div>
+
+    <br/><br/><br/>
+    <td th:switch="${view.buttonToShow}">
+        <div th:case="'home'">
+            <a th:href="@{/home}" class="button">Home</a>
+        </div>
+        <div th:case="'download'">
+            <a th:href="@{/download-all(yyyyMM=${yyyyMM})}" class="button">Downloads</a>
+        </div>
+        <div th:case="'upload'">
+            <a th:href="@{/upload-ena}" class="button">Upload corrected ENA Timesheet</a>
+        </div>
+    </td>
+
+</div>
+</body>
+</html>

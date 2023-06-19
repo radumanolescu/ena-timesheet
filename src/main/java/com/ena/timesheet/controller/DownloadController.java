@@ -25,8 +25,10 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static com.ena.timesheet.util.Time.mmyyFmt;
+
 @Controller
-public class DownloadController extends ControllerBase {
+public class DownloadController  {
     private static final String dropdownsFilename = "ena_dropdown.txt";
     private static final DateTimeFormatter mdyFmt = DateTimeFormatter.ofPattern("MMMM d, yyyy");
     private static final DateTimeFormatter yyyyMMddFmt = DateTimeFormatter.ofPattern("yyyyMMdd");

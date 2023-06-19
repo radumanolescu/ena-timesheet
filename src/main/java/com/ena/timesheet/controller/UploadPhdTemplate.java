@@ -14,6 +14,9 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 import java.io.InputStream;
 
+import static com.ena.timesheet.util.Time.getMonthYear;
+import static com.ena.timesheet.util.Time.getYearMonth;
+
 @Controller
 public class UploadPhdTemplate extends PhdUploadFlow {
 
