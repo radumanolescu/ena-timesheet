@@ -22,6 +22,7 @@
         <thymeleaf.version>3.1.1.RELEASE</thymeleaf.version>
         <aws.java.sdk.version>2.20.45</aws.java.sdk.version>
         <hibernate-validator.version>6.0.9.Final</hibernate-validator.version>
+        <apache.commons.text.version>1.10.0</apache.commons.text.version>
     </properties>
 
     <dependencyManagement>
@@ -174,6 +175,11 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>${jackson.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>${apache.commons.text.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
@@ -212,9 +218,6 @@
             <testResource>
                 <directory>src/it/resources</directory>
             </testResource>
-            <!--<testSources>
-                <directory>src/it/java</directory>
-            </testSources>-->
         </testResources>
         <pluginManagement>
             <plugins>
@@ -301,6 +304,25 @@
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>add-test-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/it/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         <finalName>ROOT</finalName>
     </build>

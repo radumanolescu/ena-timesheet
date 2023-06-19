@@ -8,7 +8,9 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class PhdUploadFlow extends ControllerBase {
+import static com.ena.timesheet.util.IOUtil.getBytes;
+
+public class PhdUploadFlow {
     protected void saveTemplateAndDropdowns(String yearMonth, InputStream inputStream, DynamoDbClient dynamoDBClient) throws IOException {
         byte[] fileBytes = getBytes(inputStream);
         PhdTemplateDao dao = new PhdTemplateDao(dynamoDBClient);

@@ -1,9 +1,11 @@
 package com.ena.timesheet.ena;
 
 import com.ena.timesheet.util.MondayAlignedCalendar;
+import com.ena.timesheet.util.Text;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
+import java.beans.Transient;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -16,12 +18,14 @@ import static com.ena.timesheet.xl.XlUtil.stringValue;
 public class EnaTsEntry implements Comparable<EnaTsEntry> {
 
     public EnaTsEntry() {
+        this.lineId = -1;
     }
 
     /**
      * Expected row format: projectId#activity, day, start, end, hours, description
      */
     public EnaTsEntry(int lineId, LocalDate month, Row row) {
+        this.lineId = lineId;
         this.entryId = (float) lineId;
         this.month = month;
         this.calendar = new MondayAlignedCalendar(month);
@@ -94,6 +98,13 @@ public class EnaTsEntry implements Comparable<EnaTsEntry> {
                         err.append("Description must be non-empty. ");
                     }
                     break;
+                case 6: // validation error, if previously found
+                    try {
+                        err.append(stringValue(cell));
+                    } catch (Exception e) {
+                        err.append("Error while reading the error message from the sheet. ");
+                    }
+                    break;
             }
             cellId++;
         }
@@ -101,6 +112,10 @@ public class EnaTsEntry implements Comparable<EnaTsEntry> {
             this.charge = hours * hourlyRate;
         }
         this.error = err.toString();
+        // If any validation errors are found, write them to the last cell
+        if (!this.error.isEmpty()) {
+            row.createCell(cellId).setCellValue(this.error);
+        }
         this.validCells = validCells;
     }
 
@@ -130,6 +145,7 @@ public class EnaTsEntry implements Comparable<EnaTsEntry> {
      */
     protected Float entryId;
     private LocalDate date;
+    protected final int lineId;
 
     @Override
     public boolean equals(Object o) {
@@ -224,6 +240,10 @@ public class EnaTsEntry implements Comparable<EnaTsEntry> {
         return error;
     }
 
+    protected void setError(String error) {
+        this.error = error;
+    }
+
     public Float getEntryId() {
         return entryId;
     }
@@ -252,6 +272,7 @@ public class EnaTsEntry implements Comparable<EnaTsEntry> {
      * Designed to match a corresponding entry in the PHD template
      */
     public String projectActivity() {
-        return projectId + "#" + activity;
+        return Text.unquote(projectId) + "#" + Text.unquote(activity);
     }
+
 }

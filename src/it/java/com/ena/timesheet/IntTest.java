@@ -12,15 +12,4 @@ public class IntTest {
         return resource.toURI();
     }
 
-    public byte[] getBytes(InputStream inputStream) {
-        byte[] bytes = null;
-        try {
-            bytes = new byte[inputStream.available()];
-            inputStream.read(bytes);
-        } catch (Exception e) {
-            System.out.println("Error converting InputStream to byte[]");
-        }
-        return bytes;
-    }
-
 }

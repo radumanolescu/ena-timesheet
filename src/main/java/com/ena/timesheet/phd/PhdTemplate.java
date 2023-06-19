@@ -6,12 +6,15 @@ import org.apache.poi.ss.usermodel.*;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.ena.timesheet.util.IOUtil.getBytes;
 
 public class PhdTemplate {
     public PhdTemplate(String yearMonth, List<PhdTemplateEntry> entries) {
@@ -39,8 +42,6 @@ public class PhdTemplate {
             Parser parser = new Parser();
             this.entries = parser.parseEntries(inputStream);
             this.xlsxBytes = Files.readAllBytes(phdTemplateFile.toPath());
-        } catch (Exception e) {
-            throw e;
         }
     }
 
@@ -51,10 +52,9 @@ public class PhdTemplate {
     public byte[] dropdowns() {
         StringBuilder sb = new StringBuilder();
         for (String clientTask : clientTasks()) {
-            sb.append(clientTask + "\r\n");
+            sb.append(clientTask).append("\r\n");
         }
-        byte[] bytes = sb.toString().getBytes(Charset.forName("UTF-8"));
-        return bytes;
+        return sb.toString().getBytes(StandardCharsets.UTF_8);
     }
 
     public List<String> clientTasks() {
@@ -175,15 +175,8 @@ public class PhdTemplate {
         }
     }
 
-    public byte[] getBytes(InputStream inputStream) {
-        byte[] bytes = null;
-        try {
-            bytes = new byte[inputStream.available()];
-            inputStream.read(bytes);
-        } catch (Exception e) {
-            System.out.println("Error converting InputStream to byte[]");
-        }
-        return bytes;
+    public void writeFile(File output) throws IOException {
+        Files.write(output.toPath(), xlsxBytes);
     }
 
 }
