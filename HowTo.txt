@@ -18,7 +18,10 @@ Upload the ENA Timesheet from
 
 Check for errors, fix, repeat
 
-Download the outputs to
+Download the outputs
+
+Move the output files to the correct location
+C:\dev\ena-timesheet\mv-to-out.ps1
 \\HIPPIE\SharedByRadu\-\ena-out\PHD timesheet yyyy-MM.xlsx
 \\HIPPIE\SharedByRadu\-\ena-out\ena_dropdown.txt
 
