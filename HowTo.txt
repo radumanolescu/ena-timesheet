@@ -1,0 +1,28 @@
+Start Docker and ensure DynamoDB is running
+Create the tables in DynamoDB
+aws dynamodb create-table --table-name PhdTemplate --attribute-definitions AttributeName=yyyyMM,AttributeType=S --key-schema AttributeName=yyyyMM,KeyType=HASH --endpoint-url http://localhost:8001 --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
+aws dynamodb create-table --table-name PhdDropdowns --attribute-definitions AttributeName=yyyyMM,AttributeType=S --key-schema AttributeName=yyyyMM,KeyType=HASH --endpoint-url http://localhost:8001 --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
+aws dynamodb create-table --table-name EnaTimesheet --attribute-definitions AttributeName=yyyyMM,AttributeType=S --key-schema AttributeName=yyyyMM,KeyType=HASH --endpoint-url http://localhost:8001 --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
+
+Run the application
+.\run.ps1
+
+Open the application in a browser
+http://localhost:8080
+
+Upload the PHD Template from
+\\HIPPIE\SharedByRadu\-\ena-in
+
+Upload the ENA Timesheet from
+\\HIPPIE\SharedByRadu\-\ena-in
+
+Check for errors, fix, repeat
+
+Download the outputs to
+\\HIPPIE\SharedByRadu\-\ena-out\PHD timesheet yyyy-MM.xlsx
+\\HIPPIE\SharedByRadu\-\ena-out\ena_dropdown.txt
+
+Print the ENA invoice to
+\\HIPPIE\SharedByRadu\-\ena-out\Timesheet-SEN-yyyy-MM.pdf
+
+Email all the outputs to Elaine

@@ -107,7 +107,7 @@ public class DownloadController  {
 
     private String phdTimesheetFileName(String yyyyMM) {
         // "PHD Timesheet 2023-03.xlsx
-        return "PHD Timesheet " + yyyyMM.substring(0, 4) + "-" + yyyyMM.substring(4, 6) + ".xlsx";
+        return "PHD timesheet " + yyyyMM.substring(0, 4) + "-" + yyyyMM.substring(4, 6) + ".xlsx";
     }
 
     private LocalDate invoiceMonth(String yyyyMM) {
