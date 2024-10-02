@@ -22,10 +22,10 @@ Download the outputs
 
 Move the output files to the correct location
 C:\dev\ena-timesheet\mv-to-out.ps1
-\\HIPPIE\SharedByRadu\-\ena-out\PHD timesheet yyyy-MM.xlsx
+\\HIPPIE\SharedByRadu\-\ena-out\PHD Timesheet yyyy-MM.xlsx
 \\HIPPIE\SharedByRadu\-\ena-out\ena_dropdown.txt
 
 Print the ENA invoice to
-\\HIPPIE\SharedByRadu\-\ena-out\Timesheet-SEN-yyyy-MM.pdf
+\\HIPPIE\SharedByRadu\-\ena-out\Timesheet-ENA-yyyy-MM.pdf
 
 Email all the outputs to Elaine
