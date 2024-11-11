@@ -8,12 +8,14 @@ import java.beans.Transient;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Model for a single row in the PHD template
+ */
 public class PhdTemplateEntry extends JsonMapped<PhdTemplateEntry> {
 
-    public PhdTemplateEntry() {
-        // used in ser/de test
-    }
-
+    /**
+     * Apache POI row number, zero-based
+     */
     private int rowNum;
     private String client;
     private String task;
@@ -61,6 +63,15 @@ public class PhdTemplateEntry extends JsonMapped<PhdTemplateEntry> {
         return "\"" + clean(client) + "\",\"" + clean(task) + "\"";
     }
 
+    @Transient
+    public String clientTaskEffort() {
+        StringBuilder clientTask = new StringBuilder(clientCommaTask());
+        for (int i = 1; i <= 31; i++) {
+            clientTask.append(",").append(effort.getOrDefault(i, 0.0));
+        }
+        return clientTask.toString();
+    }
+
     /**
      * A concatenation of `client#task`, stripped of all quotes, separated by #
      */
@@ -91,16 +102,12 @@ public class PhdTemplateEntry extends JsonMapped<PhdTemplateEntry> {
         return rowNum;
     }
 
-    public void setRowNum(int rowNum) {
-        this.rowNum = rowNum;
-    }
-
     @JsonIgnore
     public boolean isBlank() {
         return Text.isBlank(client) && Text.isBlank(task);
     }
 
-    public String entryType(){
+    public String entryType() {
         String cl = Text.isBlank(client) ? "null" : "Client";
         String tk = Text.isBlank(task) ? "null" : "Task";
         return cl + "_" + tk;

@@ -85,8 +85,8 @@ public class DownloadController  {
             prepareModelForDisplay(invoiceMonth, enaTimesheet, model);
             return "invoice";
         } catch (Exception e) {
-            System.out.println("Error uploading file");
-            e.printStackTrace();
+            System.out.println("Error uploading file: " + e.getMessage());
+//            e.printStackTrace();
             String stackTrace = Text.stackFormatter2(e);
             model.addAttribute("stackTrace", stackTrace);
             return "error-ena";
@@ -106,8 +106,8 @@ public class DownloadController  {
     }
 
     private String phdTimesheetFileName(String yyyyMM) {
-        // "PHD Timesheet 2023-03.xlsx
-        return "PHD Timesheet " + yyyyMM.substring(0, 4) + "-" + yyyyMM.substring(4, 6) + ".xlsx";
+        // e.g."PHD ENA Timesheet 2023-03.xlsx"
+        return "PHD ENA Timesheet " + yyyyMM.substring(0, 4) + "-" + yyyyMM.substring(4, 6) + ".xlsx";
     }
 
     private LocalDate invoiceMonth(String yyyyMM) {

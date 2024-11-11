@@ -5,7 +5,6 @@ import com.ena.timesheet.ena.EnaTsEntry;
 import org.apache.poi.ss.usermodel.*;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashSet;
@@ -110,9 +109,16 @@ public class PhdTemplate {
         double enaTotalHours = enaTimesheet.totalHours();
         double phdTotalHours = totalHours();
         if (enaTotalHours != phdTotalHours) {
+            printEntries();
             throw new RuntimeException("Total hours mismatch: ENA=" + enaTotalHours + " PHD=" + phdTotalHours);
         }
         updateXlsx(0);
+    }
+
+    private void printEntries() {
+        for (PhdTemplateEntry entry : entries) {
+            System.out.println(entry.clientTaskEffort());
+        }
     }
 
     public void checkTasks(EnaTimesheet enaTimesheet) {

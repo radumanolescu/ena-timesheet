@@ -14,15 +14,18 @@ import java.time.ZoneId;
 public class XlUtil {
     public static final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
-    public static LocalDate getLocalDate(Cell cell) {
-        return cell.getDateCellValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-    }
+//    public static LocalDate getLocalDate(Cell cell) {
+//        return cell.getDateCellValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//    }
 
     public static LocalTime getLocalTime(Cell cell) {
         return cell.getDateCellValue().toInstant().atZone(ZoneId.systemDefault()).toLocalTime();
     }
 
     public static String stringValue(Cell cell) {
+        if (cell == null) {
+            return "";
+        }
         switch (cell.getCellType()) {
             case STRING:
                 return cell.getRichStringCellValue().getString();
@@ -31,7 +34,7 @@ public class XlUtil {
             case BOOLEAN:
                 return cell.getBooleanCellValue() + "";
             case FORMULA:
-                return cell.getCellFormula() + "";
+                return cell.getCellFormula();
             default:
                 return "";
         }

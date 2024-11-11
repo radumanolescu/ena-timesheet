@@ -5,7 +5,7 @@ foreach ($file in $files) {
     Move-Item -Path $file.FullName -Destination \\HIPPIE\SharedByRadu\-\ena-out -Force
 }
 
-$files = Get-ChildItem -Path "\Users\Radu\Downloads\PHD timesheet *.xlsx"
+$files = Get-ChildItem -Path "\Users\Radu\Downloads\PHD ENA Timesheet *.xlsx"
 foreach ($file in $files) {
     Move-Item -Path $file.FullName -Destination \\HIPPIE\SharedByRadu\-\ena-out -Force
 }
