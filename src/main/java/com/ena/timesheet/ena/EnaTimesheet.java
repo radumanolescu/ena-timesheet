@@ -248,6 +248,8 @@ public class EnaTimesheet {
                 String err0 = entry.getError();
                 String suggested = bestMatch(entry.projectActivity(), clientTaskSet);
                 String err1 = "Invalid project#activity. Did you mean '" + suggested + "'?";
+                System.out.println("NotInClientTaskSet [" + entry.lineId + "] " + entry.projectActivity() + " -> " + suggested);
+                System.out.println(err0 + err1);
                 entry.setError(err0 + err1);
             }
         }

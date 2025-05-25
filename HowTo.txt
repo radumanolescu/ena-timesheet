@@ -1,6 +1,6 @@
 Start Docker and ensure DynamoDB is running
 Create the tables in DynamoDB
-.\create-table.cmd
+.\create_table.cmd
 
 Run the application
 .\run.ps1
